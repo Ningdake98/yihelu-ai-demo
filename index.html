@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>颐和路书旅 · 民国AI换装打卡 — 方案展示</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'PingFang SC','Microsoft YaHei','Segoe UI',sans-serif;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);min-height:100vh;color:#e8e8e8;display:flex;flex-direction:column;align-items:center;padding:40px 20px}
+.header{text-align:center;margin-bottom:40px;animation:fadeUp .8s ease}
+.header h1{font-size:2.4em;font-weight:700;background:linear-gradient(90deg,#e2b97a,#f5d9a0,#e2b97a);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.header .subtitle{font-size:1.1em;color:#a8a8b8;letter-spacing:2px}
+.lang-toggle{position:fixed;top:20px;right:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#e8e8e8;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:.85em;backdrop-filter:blur(10px);transition:all .3s}
+.lang-toggle:hover{background:rgba(255,255,255,.2)}
+.cards{display:flex;flex-wrap:wrap;gap:30px;justify-content:center;max-width:1100px;width:100%}
+.card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:32px;width:320px;cursor:pointer;transition:all .4s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;backdrop-filter:blur(6px)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity .4s}
+.card:hover{transform:translateY(-8px);border-color:rgba(255,255,255,.25);box-shadow:0 20px 40px rgba(0,0,0,.3);background:rgba(255,255,255,.1)}
+.card:hover::before{opacity:1}
+.card .icon{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8em;margin-bottom:20px;background:var(--icon-bg)}
+.card h2{font-size:1.3em;margin-bottom:6px;color:#f0f0f0}
+.card .en-title{font-size:.85em;color:#888;min-height:20px}
+.card .desc{font-size:.92em;color:#b0b0c0;margin-top:14px;line-height:1.6}
+.card .en-desc{font-size:.82em;color:#777;margin-top:4px;line-height:1.5}
+.card .tag{display:inline-block;font-size:.75em;padding:3px 10px;border-radius:12px;margin-top:16px;background:var(--tag-bg);color:var(--accent)}
+.card .arrow{margin-top:20px;font-size:.9em;color:var(--accent);display:flex;align-items:center;gap:6px;transition:gap .3s}
+.card:hover .arrow{gap:12px}
+.footer{margin-top:50px;text-align:center;color:#666;font-size:.85em;line-height:1.8}
+.footer a{color:#888;text-decoration:none;border-bottom:1px dashed #555}
+.footer a:hover{color:#bbb}
+.hide-en .en-title,.hide-en .en-desc,.hide-en .en-footer{display:none}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.card:nth-child(1){animation:fadeUp .6s ease .1s both}
+.card:nth-child(2){animation:fadeUp .6s ease .2s both}
+.card:nth-child(3){animation:fadeUp .6s ease .3s both}
+</style>
+</head>
+<body>
+<button class="lang-toggle" onclick="document.body.classList.toggle('hide-en')" id="langBtn">中/EN</button>
+
+<div class="header">
+<h1>颐和路书旅 · 民国AI换装打卡</h1>
+<p class="subtitle">AI换装方案展示 · 方案总览</p>
+</div>
+
+<div class="cards">
+<div class="card" style="--accent:#e2b97a;--icon-bg:rgba(226,185,122,.15);--tag-bg:rgba(226,185,122,.12)" onclick="go('方案A_真人脸融合版/index.html')">
+<div class="icon">📸</div>
+<h2>方案A · 真人脸融合版</h2>
+<p class="en-title">Plan A · Real Face Blending</p>
+<p class="desc">上传照片，AI自动融合到民国服装模特脸部，生成如同实拍写真的换装海报。</p>
+<p class="en-desc">Upload your photo, AI blends it onto the model's face for a photorealistic poster.</p>
+<span class="tag">写实风格 · Realistic</span>
+<div class="arrow">点击进入 · Enter →</div>
+</div>
+
+<div class="card" style="--accent:#7ec8e3;--icon-bg:rgba(126,200,227,.15);--tag-bg:rgba(126,200,227,.12)" onclick="go('方案B_手绘卡通脸版/index.html')">
+<div class="icon">🎨</div>
+<h2>方案B · 手绘卡通脸版</h2>
+<p class="en-title">Plan B · Hand-drawn Cartoon Face</p>
+<p class="desc">上传照片，AI转换为零真人感的手绘卡通画风，与民国服装完美融合。</p>
+<p class="en-desc">Upload your photo, AI transforms it into a pure hand-drawn cartoon style poster.</p>
+<span class="tag">卡通风格 · Cartoon</span>
+<div class="arrow">点击进入 · Enter →</div>
+</div>
+
+<div class="card" style="--accent:#d4a5d4;--icon-bg:rgba(212,165,212,.15);--tag-bg:rgba(212,165,212,.12)" onclick="go('方案三_写实融合版/index.html')">
+<div class="icon">✨</div>
+<h2>方案三 · 写实融合版</h2>
+<p class="en-title">Plan C · Enhanced Realistic Blending</p>
+<p class="desc">增强版写实融合，YCbCr色彩匹配+下颌延伸+羽化边缘，肤色过渡更自然。</p>
+<p class="en-desc">Enhanced realistic blending with color matching and feathered edges for natural skin tones.</p>
+<span class="tag">增强写实 · Enhanced</span>
+<div class="arrow">点击进入 · Enter →</div>
+</div>
+</div>
+
+<div class="footer">
+<p>颐和路书旅 · 民国AI换装打卡方案展示</p>
+<p class="en-footer">Yihe Road Book Journey · Republican Era AI Dress-Up Photo Booth</p>
+</div>
+
+<script>
+function go(path){
+location.href=encodeURI(path);
+}
+</script>
+</body>
+</html>

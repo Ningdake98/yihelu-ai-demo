@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>颐和路书旅 · 民国AI换装打卡</title>
+<style>
+  :root{
+    --brown:#6d5a44; --ink:#3a332b; --sub:#91877a; --bg:#f5f1ea; --card:#fffdf9;
+    --m1:#c9b8a3; --m2:#a8b5a0; --m3:#b5a0a8; --line:#e8e1d5; --accent:#8a7355;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{background:#e7e0d5;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink)}
+  /* 双语：英文为副语言，可通过右上角 EN 开关关闭（仅中文用户） */
+  .en{color:var(--sub);font-weight:400}
+  body.en-off .en{display:none}
+  .en.sm{font-size:.82em}
+  #app{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);box-shadow:0 0 24px rgba(0,0,0,.1);position:relative}
+  .btn{display:inline-block;border:none;border-radius:999px;padding:11px 22px;font-size:14.5px;cursor:pointer;font-weight:600}
+  .btn-p{background:var(--accent);color:#fff}
+  .btn-o{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+  .btn-g{background:#efe9df;color:var(--sub)}
+  .btn-r{background:#a34a3f;color:#fff}
+  .card{background:var(--card);border-radius:18px;padding:15px;margin-bottom:12px;box-shadow:0 2px 10px rgba(90,70,40,.07)}
+  .sub{color:var(--sub);font-size:12.5px}
+  .btn:disabled{opacity:.45}
+
+  /* splash */
+  #scr-splash{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:30px 26px;background:linear-gradient(170deg,#efe8dc,#f7f3ea)}
+  #splashMap{width:100%;border-radius:20px;aspect-ratio:16/9;object-fit:cover;background:#e3dacb;margin:18px 0}
+  #scr-splash h1{font-size:24px;letter-spacing:2px}
+  #scr-splash .slogan{color:var(--sub);font-size:13.5px;line-height:1.8;margin-bottom:22px}
+  #scr-splash .btn{width:100%;margin-bottom:11px;padding:14px}
+
+  /* top */
+  .top{position:sticky;top:0;z-index:5;background:linear-gradient(120deg,#6d5a44,#8a7355);color:#fff;padding:12px 16px 10px;border-radius:0 0 20px 20px}
+  .top .tt{font-size:17px;font-weight:700;letter-spacing:1px}
+  .top .ss{font-size:11px;opacity:.85;margin-top:2px}
+  .top .hr{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+  .hpill{display:inline-flex;align-items:center;gap:3px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+
+  .page{display:none;padding:14px 14px 92px;min-height:calc(100vh - 60px)}
+  .page.on{display:block}
+
+  /* tabs */
+  nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;border-top:1px solid var(--line);display:flex;z-index:20;padding-bottom:env(safe-area-inset-bottom)}
+  nav button{flex:1;background:none;border:none;padding:9px 0 7px;font-size:10.5px;color:var(--sub);cursor:pointer}
+  nav button .ic{display:block;font-size:20px;margin-bottom:2px}
+  nav button.on{color:var(--accent);font-weight:700}
+
+  /* map：地图默认锁定完整显示，不受视口裁剪 */
+  .mapwrap{position:relative;border-radius:18px;overflow:hidden;box-shadow:0 3px 14px rgba(90,70,40,.15)}
+  .mapwrap img{width:100%;height:auto;display:block;background:#e3dacb}
+  .dot{position:absolute;width:30px;height:30px;transform:translate(-50%,-50%);cursor:pointer}
+  .dot i{position:absolute;inset:6px;background:#a34a3f;border-radius:50%;box-shadow:0 0 0 3px rgba(163,74,63,.3)}
+  .dot::after{content:'';position:absolute;inset:0;border-radius:50%;background:rgba(163,74,63,.35);animation:pulse 1.8s infinite}
+  .dot b{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:10.5px;color:#5a4632;background:rgba(255,253,249,.92);padding:1px 7px;border-radius:999px;white-space:nowrap;font-weight:600}
+  @keyframes pulse{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.1);opacity:0}}
+  .maplegend{margin-top:10px}
+  .maplegend span{display:inline-block;font-size:11px;color:var(--sub);margin-right:10px}
+
+  /* books */
+  .bk{display:flex;gap:12px}
+  .bk img{width:76px;height:76px;border-radius:12px;object-fit:cover;flex:0 0 auto;background:#e3dacb}
+  .bk .t{font-size:15px;font-weight:700}
+  .bk .a{font-size:11px;color:var(--sub);margin:3px 0 6px}
+  .bk .d{font-size:12.5px;color:#5c5348;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .quotes .q{padding:11px 12px;border-bottom:1px dashed var(--line);font-size:13.5px;line-height:1.7;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .quotes .q:last-child{border:none}
+  .q button{flex:0 0 auto;border:1px solid var(--accent);background:#fff;color:var(--accent);font-size:11px;border-radius:999px;padding:5px 10px;cursor:pointer}
+  .q button.on{background:var(--accent);color:#fff}
+
+  /* checkin */
+  .stepT{font-size:14px;font-weight:700;margin:16px 0 8px}
+  .stepT small{color:var(--sub);font-weight:400;margin-left:6px;font-size:11px}
+  .gseg{display:flex;gap:8px;margin-bottom:10px}
+  .gseg button{flex:1;border:1.5px solid var(--line);background:#fff;color:var(--sub);border-radius:999px;padding:10px 0;font-size:13.5px;font-weight:600;cursor:pointer}
+  .gseg button.on{border-color:var(--accent);background:var(--accent);color:#fff}
+  .gseg button .en{color:inherit;opacity:.75}
+  .selrow{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px}
+  .sel{flex:0 0 auto;width:104px;border:2px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;background:#fff;text-align:center}
+  .sel img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:#efe9df}
+  .sel .nm{font-size:11.5px;padding:6px 4px}
+  .sel.on{border-color:var(--accent);box-shadow:0 0 0 3px rgba(138,115,85,.15)}
+  .bgsel{flex:0 0 auto;width:140px}
+  .bgsel img{aspect-ratio:16/10}
+  .stage{position:relative;width:100%;max-width:340px;aspect-ratio:3/4;margin:0 auto;border-radius:18px;overflow:hidden;background:#e3dacb;box-shadow:0 4px 16px rgba(90,70,40,.18)}
+  .stage img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .stage canvas.fit{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .stage .face{position:absolute;transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,.65);box-shadow:0 2px 8px rgba(0,0,0,.25);background:#cbbfae;z-index:2}
+  .stage .fit{z-index:1}
+  .stage .face img{width:100%;height:100%;object-fit:cover;filter:sepia(.45) saturate(.92) contrast(.96)}
+  .stage .face.empty::after{content:'👤 人脸待合成';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;background:rgba(0,0,0,.25)}
+  .stage .qt{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(40,30,18,.72));color:#fff;padding:26px 14px 12px;font-size:12.5px;line-height:1.6;text-align:center}
+  .stage .wm{position:absolute;top:10px;right:12px;font-size:10px;color:rgba(255,255,255,.92);background:rgba(60,45,30,.45);padding:2px 9px;border-radius:999px}
+  video{width:100%;max-width:340px;border-radius:16px;display:block;margin:0 auto;background:#222}
+  .sliders{display:flex;flex-direction:column;gap:6px;background:#fff;border-radius:14px;padding:12px 14px;margin-top:10px}
+  .sliders label{font-size:11.5px;color:var(--sub);display:flex;align-items:center;gap:8px}
+  .sliders input{flex:1;accent-color:var(--accent)}
+  .rowb{display:flex;gap:9px;margin-top:12px}
+  .rowb .btn{flex:1;padding:11px 6px;font-size:13px}
+
+  /* sheet & modal */
+  .mask{position:fixed;inset:0;background:rgba(40,30,18,.5);z-index:30;display:none;align-items:flex-end;justify-content:center}
+  .mask.on{display:flex}
+  .sheet{background:var(--card);width:100%;max-width:430px;border-radius:22px 22px 0 0;padding:20px 18px 28px;max-height:86vh;overflow-y:auto}
+  .sheet h3{font-size:17px;margin-bottom:10px}
+  .x{float:right;border:none;background:#efe9df;width:28px;height:28px;border-radius:50%;font-size:14px;color:var(--sub);cursor:pointer}
+  .pill{display:inline-block;font-size:11px;background:#f0e8da;color:var(--accent);border-radius:999px;padding:3px 10px;margin-right:6px}
+
+  /* gallery */
+  .gal{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .gal .g{position:relative;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(90,70,40,.15)}
+  .gal img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+  .gal video{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:#000}
+  .gal .tagv{position:absolute;top:8px;left:8px;background:rgba(60,45,30,.72);color:#fff;font-size:10px;padding:2px 9px;border-radius:999px;z-index:2}
+
+  /* 点位推荐拍照点 */
+  .spotH{margin:16px 0 8px;font-size:14px;font-weight:700}
+  .spotH .en{font-weight:400;font-size:12px}
+  .spotnote{font-size:11px;color:#8a7355;background:#f7f0e2;border:1px dashed #d3bd97;border-radius:10px;padding:7px 10px;line-height:1.6;margin-bottom:10px}
+  .spot{border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 13px;margin-bottom:10px}
+  .spot b{font-size:13.5px}
+  .spot .d{font-size:12px;color:var(--sub);line-height:1.6;margin:5px 0 9px}
+  .spotbtns{display:flex;gap:8px}
+  .spotbtn{flex:1;text-align:center;text-decoration:none;font-size:12.5px;font-weight:700;border-radius:999px;padding:8px 0;cursor:pointer}
+  .spotbtn.g{background:#4a6151;color:#fff}
+  .spotbtn.a{border:1.5px solid #4a6151;color:#4a6151;background:#fff}
+  .gal .cap{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(40,30,18,.75));color:#fff;font-size:10px;padding:14px 8px 6px;line-height:1.4}
+  .empty{text-align:center;color:var(--sub);font-size:13px;padding:44px 0}
+  .demo-hint{background:#f7f0e2;border:1px dashed #d3bd97;color:#8a7355;font-size:11.5px;border-radius:10px;padding:8px 10px;margin-bottom:12px;line-height:1.6}
+  #toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:rgba(50,40,28,.94);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;z-index:99;display:none;max-width:86%;text-align:center}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- 启动页：先看街区 -->
+  <div id="scr-splash">
+    <h1>颐和路书旅 <span class="en sm" style="font-weight:400">Yihe Road Book Journey</span></h1>
+    <div class="slogan">锦创书城·颐和路店 × 民国AI换装打卡阅读平台<br><span class="en" style="font-size:11.5px">Jinchuang Bookstore × ROC AI Dress-up</span></div>
+    <img id="splashMap" alt="颐和路手绘地图">
+    <button class="btn btn-p" onclick="enter()">进入街区，开始书旅 → <span class="en sm">Enter the District</span></button>
+    <div class="sub" style="font-size:11px">游客模式 · 无需注册（演示原型）<br><span class="en" style="font-size:10px">Guest mode · No registration needed</span></div>
+  </div>
+
+  <div id="scr-main" style="display:none">
+    <div class="top">
+      <div class="hr">
+        <div>
+          <div class="tt">颐和路书旅 · 民国AI换装打卡 <span class="en" style="font-size:11px;font-weight:400">Yihe Road · ROC AI Dress-up</span></div>
+          <div class="ss">实景地图 → 文脉书单 → 金句品读 → AI民国换装 → 一键传播 <span class="en">Map → Books → Quotes → AI Dress-up → Share</span></div>
+        </div>
+        <button class="hpill" onclick="toggleEn()">EN <span id="enMark">✓</span></button>
+      </div>
+    </div>
+
+    <!-- 街区地图 -->
+    <div class="page on" id="pg-map">
+      <div class="demo-hint">点击地图上的<strong>闪光点位</strong>，查看街区历史文脉，每个点位都对应一本专属书籍（一景一书）。<br><span class="en">Tap a glowing spot to explore its history and the book behind it — One Spot, One Book.</span></div>
+      <div class="mapwrap"><img id="mapImg" alt="颐和路手绘地图"><div id="dots"></div></div>
+      <div class="maplegend card" style="margin-top:12px">
+        <b style="font-size:13.5px">🗺️ 本店限定 · 街区文化动线 <span class="en" style="font-weight:400;font-size:12px">Store-exclusive cultural route</span></b>
+        <div style="margin-top:8px">
+          <span>🏛️ 公馆区 <span class="en">Mansions</span></span><span>🌳 梧桐大道 <span class="en">Plane Ave.</span></span><span>🏫 旧址群 <span class="en">Heritage</span></span><span>📖 锦创书城 <span class="en">Bookstore</span></span><span>✒️ 文人巷弄 <span class="en">Writers' Lanes</span></span>
+        </div>
+        <div class="sub" style="margin-top:8px;line-height:1.7">「一条颐和路，半部民国史。」—— 先看街区、再读文脉、共阅书籍，欢迎常逛常来本店内打卡留念。<br><span class="en">"One Yihe Road holds half of the Republic's history." See the district, read its story, enjoy the books together — and check in at our store often.</span></div>
+      </div>
+    </div>
+
+    <!-- 文脉书单 -->
+    <div class="page" id="pg-books">
+      <div class="card" style="background:linear-gradient(120deg,#efe6d6,#f6f1e7)">
+        <b style="font-size:14.5px">📚 颐和路限定书目 · 首批5本 <span class="en" style="font-weight:400;font-size:12px">Yihe Road exclusive · 5 books</span></b>
+        <div class="sub" style="margin-top:5px;line-height:1.6">围绕民国建筑、金陵文脉、街区生活精选，每本配10句传世金句，读到喜欢的句子，点「选这句打卡」即可去换装留念。<br><span class="en">Each book comes with 10 classic quotes. Tap "Use for check-in" on your favorite line.</span></div>
+      </div>
+      <div id="bookList"></div>
+    </div>
+
+    <!-- 打卡换装 -->
+    <div class="page" id="pg-fit">
+      <div class="stepT">① 选择性别与民国装扮 <small>AI 合成 · 三大类男女款 <span class="en">Gender & ROC outfit</span></small></div>
+      <div class="gseg">
+        <button id="gF" class="on" onclick="setGender('f')">👧 女生装扮 <span class="en">Female</span></button>
+        <button id="gM" onclick="setGender('m')">👨 先生装扮 <span class="en">Male</span></button>
+      </div>
+      <div class="selrow" id="fitRow"></div>
+      <div class="stepT">② 选择打卡背景 <small>店内书香 / 颐和路梧桐街景 <span class="en">Bookstore / Plane-tree street</span></small></div>
+      <div class="selrow" id="bgRow"></div>
+      <div class="stepT">③ 获取你的人脸 <small>示例人像 / 拍照 / 上传，仅本地合成 <span class="en">Sample photo / camera / upload</span></small></div>
+      <div class="card">
+        <video id="cam" autoplay playsinline muted style="display:none"></video>
+        <div class="rowb" style="margin-top:0">
+          <button class="btn btn-o" onclick="useSample('f')">👧 示例人像·女 <span class="en sm">Sample F</span></button>
+          <button class="btn btn-o" onclick="useSample('m')">👨 示例人像·男 <span class="en sm">Sample M</span></button>
+        </div>
+        <div class="rowb">
+          <button class="btn btn-o" id="camBtn" onclick="openCam()">📷 打开相机 <span class="en sm">Camera</span></button>
+          <button class="btn btn-o" onclick="$('#fileIn').click()">🖼️ 上传正面照 <span class="en sm">Upload</span></button>
+          <input type="file" id="fileIn" accept="image/*" style="display:none" onchange="pickFile(this)">
+        </div>
+        <div id="shotCtl" style="display:none" class="rowb">
+          <button class="btn btn-p" onclick="snap()">咔嚓！拍下这一刻 <span class="en sm">Snap</span></button>
+          <button class="btn btn-g" onclick="closeCam()">关闭相机 <span class="en sm">Close</span></button>
+        </div>
+        <div class="sliders">
+          <label>脸的位置·上下 <span class="en">Up/Down</span><input type="range" id="slY" min="5" max="50" value="19" step="0.5" oninput="setFace()"></label>
+          <label>脸的位置·左右 <span class="en">Left/Right</span><input type="range" id="slX" min="10" max="90" value="50" step="0.5" oninput="setFace()"></label>
+          <label>脸的大小 <span class="en">Size</span><input type="range" id="slR" min="6" max="20" value="11" step="0.2" oninput="setFace()"></label>
+        </div>
+        <div class="sub" style="margin-top:6px">AI 手绘卡通脸：打卡背景置于海报最底层；示例人像或上传照片经 AI 人脸识别定位五官脸型，再把真人脸 AI 手绘化为与服装画风一致的卡通人脸，自动贴合无脸服装模型的脸部位置与大小——整张海报画风完全统一；滑杆可微调（±15%）。日常装白底与肢体缝隙透出背景，四肢保持不透明（男女同规则）。<br><span class="en">AI cartoon face: detects face, hand-draws it to match the outfit art style, auto-fits onto the faceless model — one unified art style; sliders fine-tune ±15%.</span></div>
+      </div>
+      <div class="stepT">④ 打卡预览 <small id="quoteShow"></small></div>
+      <div class="stage" id="stage">
+        <img class="bg" id="stBg" alt="">
+        <div class="face empty" id="stFace"><img id="stFaceImg" alt=""></div>
+        <canvas class="fit" id="stFit"></canvas>
+        <div class="qt" id="stQt"></div>
+        <div class="wm">锦创书城·颐和路店 <span class="en">Jinchuang Books</span></div>
+      </div>
+      <div class="rowb">
+        <button class="btn btn-p" onclick="makePoster()">🖼️ 生成打卡海报 <span class="en sm">Poster</span></button>
+        <button class="btn btn-p" onclick="makeVideo()">🎬 生成短视频 <span class="en sm">Video</span></button>
+      </div>
+      <div class="rowb">
+        <button class="btn btn-o" onclick="saveWork()">📚 存入颐和路读书图鉴 <span class="en sm">Save to Gallery</span></button>
+        <button class="btn btn-g" onclick="shareWork()">分享给朋友 <span class="en sm">Share</span></button>
+      </div>
+      <div class="sub" style="text-align:center;margin-top:10px;font-size:11px">生成的打卡海报与短视频会自动存入「读书图鉴」· 短视频（演示5秒）也可保存发朋友圈/抖音<br><span class="en">Posters & videos are auto-saved to the Gallery · share to Moments or Douyin.</span></div>
+    </div>
+
+    <!-- 读书图鉴 -->
+    <div class="page" id="pg-gal">
+      <div class="card" style="background:linear-gradient(120deg,#efe6d6,#f6f1e7)">
+        <b style="font-size:14.5px">🖼️ 颐和路读书图鉴 <span class="en" style="font-weight:400;font-size:12px">Yihe Road Reading Gallery</span></b>
+        <div class="sub" style="margin-top:5px">打卡海报、短视频与读书打卡都会沉淀在这里，形成门店专属的数字文创资产（本次演示会话内保存）。<br><span class="en">Posters, videos & check-ins are saved here as the store's digital cultural asset (this session).</span></div>
+      </div>
+      <div id="galList" class="gal"></div>
+      <button class="btn btn-r" style="width:100%;margin-top:16px" onclick="logout()">🚪 退出登录 <span class="en sm">Log out</span></button>
+      <div class="sub" style="text-align:center;margin-top:8px;font-size:10.5px">退出后将回到启动页，演示数据清空 <span class="en">Back to splash, demo data cleared</span></div>
+    </div>
+
+    <nav>
+      <button class="on" data-pg="pg-map" onclick="nav('pg-map',this)"><span class="ic">🗺️</span>街区地图<span class="en">Map</span></button>
+      <button data-pg="pg-books" onclick="nav('pg-books',this)"><span class="ic">📚</span>文脉书单<span class="en">Books</span></button>
+      <button data-pg="pg-fit" onclick="nav('pg-fit',this)"><span class="ic">📸</span>打卡换装<span class="en">Dress-up</span></button>
+      <button data-pg="pg-gal" onclick="nav('pg-gal',this)"><span class="ic">🖼️</span>读书图鉴<span class="en">Gallery</span></button>
+    </nav>
+  </div>
+
+  <!-- 点位文脉 -->
+  <div class="mask" id="mk-poi">
+    <div class="sheet">
+      <button class="x" onclick="closeMk('mk-poi')">✕</button>
+      <h3 id="poiName"></h3>
+      <div id="poiText" class="sub" style="line-height:1.9;font-size:13px;margin-bottom:4px"></div>
+      <div id="poiSpots"></div>
+      <div class="pill">一景一书 <span class="en">One Spot, One Book</span></div>
+      <div class="card" id="poiBook" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+  <!-- 书籍详情 -->
+  <div class="mask" id="mk-book">
+    <div class="sheet" id="bookSheet"></div>
+  </div>
+
+  <div id="toast"></div>
+</div>
+
+<script>
+/* ================= AI 生成图 ================= */
+/* AI 图 CDN 直连映射：预解析的 lf-cdn 终态地址（带 Access-Control-Allow-Origin:*，跨域可读像素，
+   人脸开洞/泛洪抠图/海报导出/短视频录制全部可用）。加载失败时 IMG() 回退 trae 生成接口原地址 */
+const CDN_MAP={
+ '手绘民国风南京颐和路街区地图插画，梧桐大道与民国公馆建筑群，米色莫兰迪配色，文艺清新手账风|landscape_16_9':'https://lf-cdn.trae.com.cn/obj/trae-ai-image/page_image/3c65f8ad3eaa9049a4d8e3d87a200dd1.jpeg',
+ '民国时期年轻女性正面肖像照，复古发型温婉浅笑，素净米灰背景，柔和影棚光，写实人像摄影，高清|square':'https://lf-cdn.trae.com.cn/obj/trae-ai-image/page_image/e3d706cff8358c0873357236ec97e8ed.jpeg',
+ '民国时期年轻男性正面肖像照，短发儒雅微笑，素净米灰背景，柔和影棚光，写实人像摄影，高清|square':'https://lf-cdn.trae.com.cn/obj/trae-ai-image/page_image/65661004cdea3ea519fa23dde4646cc6.jpeg',
+ '民国女学生装全身立绘，月白蓝盘扣上衣配藏蓝色长裙麻花辫，五四时期女学生风格，卡通手绘风格，无脸空白人形预留面部贴合层，纯白背景，高清|portrait_4_3':'https://lf-cdn.trae.com.cn/obj/trae-ai-image/page_image/9f346aaad5ffc1f8de5a1eb55d7aa4f7.jpeg',
+ '民国女性日常装全身立绘，杏色暗纹短袖旗袍，卡通手绘风格，无脸空白人形预留面部贴合层，纯白背景，高清|portrait_4_3':'https://lf-cdn.trae.com.cn/obj/trae-ai-image/page_image/47a25549013e1b389c26d9b14950ea6a.jpeg',
+ '民国女性礼服装全身立绘，深棕毛领长大衣配长裙与复古宽檐礼帽，卡通手绘风格，无脸空白人形预留面部贴合层，纯白背景，高清|portrait_4_3':'https://lf-cdn.trae.com.cn/obj/trae-ai-image/page_image/6dd6cf3c163b48fdf9bbb977d0436316.jpeg',
+ '民国男学生装全身立绘，黑色立领学生制服与制帽，五四时期男学生风格，卡通手绘风格，无脸空白人形预留面部贴合层，纯白背景，高清|portrait_4_3':'https://lf-cdn.trae.com.cn/obj/trae-ai-image/page_image/a3cf391328134d8e1cdba38d87e3aaa1.jpeg',
+ '民国男性日常装全身立绘，藏青色传统长衫配布鞋，卡通手绘风格，无脸空白人形预留面部贴合层，纯白背景，高清|portrait_4_3':'https://lf-cdn.trae.com.cn/obj/trae-ai-image/page_image/a89d711e35c13c94221947cf9e1f4008.jpeg',
+ '民国男性礼服装全身立绘，深灰西装三件套配礼帽与手杖，卡通手绘风格，无脸空白人形预留面部贴合层，纯白背景，高清|portrait_4_3':'https://lf-cdn.trae.com.cn/obj/trae-ai-image/page_image/dac77d8442a0d5f6a9f4c84cf627fb92.jpeg',
+ '书店内景插画，木质书架与暖黄灯光，民国文艺氛围，莫兰迪色调，柔和|portrait_4_3':'https://lf-cdn.trae.com.cn/obj/trae-ai-image/page_image/efec152006295c8abf31c3ebc66ad7e8.jpeg',
+ '南京颐和路梧桐街道街景插画，民国公馆建筑与梧桐落叶，黄昏柔光，莫兰迪色调|portrait_4_3':'https://lf-cdn.trae.com.cn/obj/trae-ai-image/page_image/4b30cd18f7fd1db5c4f073da33acfc8f.jpeg',
+ '书籍封面插画，梧桐树与民国老宅街道，莫兰迪色调，文艺清新，无文字|square':'https://lf-cdn.trae.com.cn/obj/trae-ai-image/page_image/99d08db12a64b57a052d584beb8916e5.jpeg',
+ '书籍封面插画，民国公馆建筑群与旧时光，莫兰迪色调，历史厚重感，无文字|square':'https://lf-cdn.trae.com.cn/obj/trae-ai-image/page_image/9e521d34df338571b231e988b5ce0ff5.jpeg',
+ '书籍封面插画，老南京市井街巷生活，茶炉与挑担剪影，暖褐莫兰迪色，无文字|square':'https://lf-cdn.trae.com.cn/obj/trae-ai-image/page_image/3fbd5fd5a242feb08f9302ec72b05a0f.jpeg',
+ '书籍封面插画，梧桐叶与城市漫步，绿意莫兰迪色，散文诗意，无文字|square':'https://lf-cdn.trae.com.cn/obj/trae-ai-image/page_image/6e49d3af23ee7499db23d05ad9fd4e16.jpeg',
+ '书籍封面插画，民国文人与旧书稿，钢笔墨水瓶剪影，复古莫兰迪色，无文字|square':'https://lf-cdn.trae.com.cn/obj/trae-ai-image/page_image/e18a6f2af5b6942adfab7094e81ced2a.jpeg'};
+const IMG=(p,sz)=>CDN_MAP[p+'|'+sz]||('https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt='+encodeURIComponent(p)+'&image_size='+sz);
+const MAP_IMG=IMG('手绘民国风南京颐和路街区地图插画，梧桐大道与民国公馆建筑群，米色莫兰迪配色，文艺清新手账风','landscape_16_9');
+/* 示例人像（男/女各一，供无照片时一键演示） */
+const SAMPLE_FACES={
+ f:IMG('民国时期年轻女性正面肖像照，复古发型温婉浅笑，素净米灰背景，柔和影棚光，写实人像摄影，高清','square'),
+ m:IMG('民国时期年轻男性正面肖像照，短发儒雅微笑，素净米灰背景，柔和影棚光，写实人像摄影，高清','square')};
+/* 三大类服装 × 男女款：学生装 / 日常装 / 礼服装 */
+const FITS=[
+ {id:'stu_f',g:'f',n:'学生装',en:'Student Look',img:IMG('民国女学生装全身立绘，月白蓝盘扣上衣配藏蓝色长裙麻花辫，五四时期女学生风格，卡通手绘风格，无脸空白人形预留面部贴合层，纯白背景，高清','portrait_4_3'),c:'#5a7ba6',f:{x:50,y:10,r:20}},
+ {id:'dai_f',g:'f',n:'日常装',en:'Daily Qipao',img:IMG('民国女性日常装全身立绘，杏色暗纹短袖旗袍，卡通手绘风格，无脸空白人形预留面部贴合层，纯白背景，高清','portrait_4_3'),c:'#c9a284',f:{x:50,y:11,r:18}},
+ {id:'for_f',g:'f',n:'礼服装',en:'Formal Gown',img:IMG('民国女性礼服装全身立绘，深棕毛领长大衣配长裙与复古宽檐礼帽，卡通手绘风格，无脸空白人形预留面部贴合层，纯白背景，高清','portrait_4_3'),c:'#6e5544',f:{x:50,y:13,r:20}},
+ {id:'stu_m',g:'m',n:'学生装',en:'Student Uniform',img:IMG('民国男学生装全身立绘，黑色立领学生制服与制帽，五四时期男学生风格，卡通手绘风格，无脸空白人形预留面部贴合层，纯白背景，高清','portrait_4_3'),c:'#2f3640',f:{x:50,y:15,r:21}},
+ {id:'dai_m',g:'m',n:'日常装',en:'Daily Robe',img:IMG('民国男性日常装全身立绘，藏青色传统长衫配布鞋，卡通手绘风格，无脸空白人形预留面部贴合层，纯白背景，高清','portrait_4_3'),c:'#3d4a5c',f:{x:50,y:14,r:19}},
+ {id:'for_m',g:'m',n:'礼服装',en:'Formal Suit',img:IMG('民国男性礼服装全身立绘，深灰西装三件套配礼帽与手杖，卡通手绘风格，无脸空白人形预留面部贴合层，纯白背景，高清','portrait_4_3'),c:'#41403c',f:{x:50,y:15,r:21}}];
+const BG_IMGS={
+ in:{n:'店内书香',en:'Bookstore',img:IMG('书店内景插画，木质书架与暖黄灯光，民国文艺氛围，莫兰迪色调，柔和','portrait_4_3'),c1:'#d9c7a8',c2:'#f3ead8'},
+ out:{n:'梧桐街景',en:'Plane-tree Street',img:IMG('南京颐和路梧桐街道街景插画，民国公馆建筑与梧桐落叶，黄昏柔光，莫兰迪色调','portrait_4_3'),c1:'#7a9b6d',c2:'#e8e2c9'}};
+const COVERS={
+ b1:IMG('书籍封面插画，梧桐树与民国老宅街道，莫兰迪色调，文艺清新，无文字','square'),
+ b2:IMG('书籍封面插画，民国公馆建筑群与旧时光，莫兰迪色调，历史厚重感，无文字','square'),
+ b3:IMG('书籍封面插画，老南京市井街巷生活，茶炉与挑担剪影，暖褐莫兰迪色，无文字','square'),
+ b4:IMG('书籍封面插画，梧桐叶与城市漫步，绿意莫兰迪色，散文诗意，无文字','square'),
+ b5:IMG('书籍封面插画，民国文人与旧书稿，钢笔墨水瓶剪影，复古莫兰迪色，无文字','square')};
+
+/* ================= 数据 ================= */
+/* spots：每个点位 3 个推荐拍照点（g=谷歌实景 / a=高德导航 链接按名称动态生成） */
+const POIS=[
+ {id:'p1',x:24,y:30,n:'颐和路公馆区',en:'Yihe Road Mansion District',t:'“一条颐和路，半部民国史。”这片民国公馆建筑群现存225幢小洋楼，黄墙黛瓦、法桐掩映，是南京保存最完整的民国住宅区之一。',ten:'"One Yihe Road holds half of the Republic\'s history." 225 surviving villas with yellow walls and plane trees make it Nanjing\'s best-preserved ROC residential area.',book:'b2',spots:[
+  {n:'黄墙黛瓦转角',en:'Yellow-wall Corner',d:'公馆黄墙与法桐同框，上午顺光最出片，穿学生装清新自然。',den:'Yellow walls with plane trees, best in morning light with the student look.'},
+  {n:'老宅门环前',en:'Antique Door Knocker',d:'特写门环与铜锁，穿礼服装复古感最强。',den:'Close-up with the knocker — best paired with formal wear.'},
+  {n:'铁艺阳台下',en:'Iron Balcony',d:'仰拍铁艺栏杆与花窗，午后侧光质感最佳。',den:'Shoot upward at the iron rails; afternoon side light works best.'}]},
+ {id:'p2',x:55,y:44,n:'梧桐大道',en:'Plane Tree Avenue',t:'中山北路—颐和路一线的法桐绿廊，是南京人心中最温柔的城市记忆。树影筛下的光斑，就是街区流动的四季。',ten:'The plane-tree corridor is Nanjing\'s gentlest urban memory — the dappled light is the district\'s flowing four seasons.',book:'b4',spots:[
+  {n:'双向梧桐拱顶',en:'Double Plane-tree Arch',d:'拐角处双向梧桐取景，上午顺光，穿民国学生装最佳。',den:'Frame both tree rows at the corner; morning light, student look.'},
+  {n:'青石板人行道',en:'Bluestone Walkway',d:'午后光斑透过树冠洒下，半身照前景留出光斑。',den:'Dappled light through the canopy; keep spots in the foreground.'},
+  {n:'路边咖啡店玻璃窗',en:'Café Glass Window',d:'自带反光出民国怀旧感；连拍后再加一道怀旧滤镜。',den:'Window reflections add a vintage vibe; burst-shoot then filter.'}]},
+ {id:'p3',x:74,y:24,n:'民国旧址群',en:'ROC Heritage Sites',t:'街区内的使馆旧址与名人旧居错落分布，一砖一瓦都藏着金陵的民国风物与市井烟火。',ten:'Former embassies and residences of notable figures are scattered here — every brick holds ROC-era life and street culture.',book:'b3',spots:[
+  {n:'使馆旧址门廊',en:'Embassy Portico',d:'石柱门廊对称构图，穿礼服装正装最出片。',den:'Symmetric portico shot — formal wear fits best.'},
+  {n:'名人旧居铭牌旁',en:'Heritage Plaque',d:'与历史铭牌合影，半身照留出铭牌文字。',den:'Pose beside the plaque, keep the text in frame.'},
+  {n:'街角老邮筒',en:'Vintage Postbox',d:'复古邮筒做前景，连拍抓走路动态。',den:'Postbox as foreground; burst-shoot while walking.'}]},
+ {id:'p4',x:44,y:70,n:'锦创书城·颐和路店',en:'Jinchuang Bookstore (Yihe Rd.)',t:'本次书旅的起点与终点。在民国街区的怀抱里翻开一本金陵之书，再带上你的“民国照”回家。',ten:'The start and end of your book journey. Open a Nanjing book amid the ROC district — and take home your "ROC photo".',book:'b1',spots:[
+  {n:'店内书墙长廊',en:'Book-wall Corridor',d:'暖光书墙为背景，手捧书本拍侧身照。',den:'Warm book-wall backdrop; hold a book, shoot from the side.'},
+  {n:'落地橱窗前',en:'Showcase Window',d:'玻璃反光叠加街景，自带双层曝光感。',den:'Glass reflections layer street and portrait in one frame.'},
+  {n:'门店招牌下',en:'Store Signboard',d:'与「锦创书城」招牌同框，打卡留证首选。',den:'Frame with the store sign — the classic check-in proof.'}]},
+ {id:'p5',x:82,y:58,n:'文人旧居巷弄',en:'Writers\' Old Lanes',t:'宁海路、江苏路一带的小巷里，曾有无数文人墨客来去。他们的脚步与文字，共同构成了街巷深处的文脉。',ten:'The lanes around Ninghai and Jiangsu Roads once welcomed writers and scholars — their footsteps and words form the district\'s literary veins.',book:'b5',spots:[
+  {n:'巷弄纵深处',en:'Lane Depth',d:'青砖小巷由近及远，居中站位纵深感最强。',den:'Center in the brick lane for maximum depth.'},
+  {n:'老茶座窗边',en:'Teahouse Window',d:'木窗棂配茶具，穿日常装长衫拍出文人气质。',den:'Wooden lattice and tea set — scholarly vibe in daily robe.'},
+  {n:'转角复古单车旁',en:'Retro Bicycle',d:'复古单车靠墙，三分构图留白墙面。',den:'Bicycle against the wall; rule-of-thirds with empty wall.'}]}];
+
+const BOOKS=[
+ {id:'b1',t:'颐和路的梧桐与时光',en:'Plane Trees and Time on Yihe Road',a:'街区人文纪实',aen:'District documentary',d:'以记者式的笔触记录颐和路的一年四季：梧桐的荣枯、老宅的晨昏、街坊的日常，是一部可以边走边读的街区传记。',
+  sc:'在锦创书城二层靠窗的位置打开它，读完一节，抬头窗外就是书里的梧桐街景。',q:[
+  '梧桐把光阴筛成碎金，落在颐和路的每一块砖上。','一条路的年纪，要用树的年轮来计算。','时光在别处奔驰，在这里散步。','老墙不语，却记得每一任花开。','午后的颐和路，连风都放轻了脚步。','梧桐叶落了一次又一次，故事却从不重复。','有些人来拍照，有些人来读史，树只管生长。','街巷是城市的日历，翻过去每一页都有名字。','黄昏的公馆窗棂里，住着没讲完的旧事。','在颐和路，慢一点，才算来过。']},
+ {id:'b2',t:'南京民国往事',en:'Nanjing: Stories of the Republic',a:'民国建筑与街巷历史',aen:'ROC architecture & street history',d:'从中山大道到颐和路公馆区，本书梳理南京民国建筑背后的历史人物与时代风云，是读懂这片街区的钥匙。',
+  sc:'逛完公馆区再读它，门环、楼梯与窗棂都有了回声。',q:[
+  '一砖一瓦，都是金陵写给民国的信。','公馆的门环叩了百年，仍带着体温。','历史不曾走远，它只是搬进了旧宅。','一条颐和路，半部民国史。','法桐夹道的街，曾是整个时代的心跳。','老宅的楼梯拐角，藏着时代的回声。','城墙记得风雨，门廊记得人来人往。','那些名字被刻上石碑，也刻进了街巷的呼吸。','民国的月光，仍照在今天的屋檐上。','读懂一栋老房子，就读懂了一段岁月。']},
+ {id:'b3',t:'民国金陵风物志',en:'A Gazetteer of ROC Jinling Life',a:'老南京街巷生活文脉',aen:'Old Nanjing street life',d:'茶炉、挑担、方言与早点，本书打捞民国南京街巷里的日常风物，还原一座城市的烟火底色。',
+  sc:'从旧址群散步回来读，市井的温度扑面而来。',q:[
+  '巷口的茶炉一响，整条街就醒了。','老南京的一天，是从一句“啊吃过啦”开始的。','挑担的、拉车的、浣衣的，都是历史的主角。','风物是城市的性格，写进了早点与方言。','石板路磨得发亮，那是岁月的包浆。','一碗鸭汤的功夫，市井便有了温度。','邮差的车铃摇过，捎来远方的春天。','旧时的灯，照旧时的摊，也照今天的我们。','街巷生活是最厚的一本地方志。','烟火不熄，文脉不断。']},
+ {id:'b4',t:'梧桐树下的南京',en:'Nanjing Under the Plane Trees',a:'颐和路街区散文随笔',aen:'Essays of Yihe Road',d:'一本适合在梧桐树下读完的散文集，写树、写街、写慢下来的城市生活，字句间尽是绿意。',
+  sc:'读完随意挑一句，走到梧桐大道拍下你的“树影打卡”。',q:[
+  '梧桐是南京最温柔的注脚。','树影摇晃的地方，就有诗。','在树下走过四季，人就慢了下来。','每片落叶，都是城市写给行人的便笺。','阳光穿过叶隙，把街道织成绿网。','夏天在梧桐伞下乘凉，冬天在枝干间读画。','一棵树的沉默，胜过千言万语。','梧桐不争朝夕，却陪了这座城一百年。','风一吹，整条街都在翻页。','阅读一棵树，也是阅读一座城。']},
+ {id:'b5',t:'民国文人与金陵街巷',en:'ROC Writers and the Lanes of Jinling',a:'适配街区文艺气质读物',aen:'Literary companion for the district',d:'鲁迅、朱自清、张恨水……文人们在金陵街巷间的行踪与笔墨，构成这条街最文艺的注脚。',
+  sc:'适合在文人旧居巷弄的茶座里，配一盏茶慢慢读。',q:[
+  '文人把街巷当稿纸，一步一句。','旧时书生，以茶代酒，以街巷为书房。','他们路过这里，也把心事留在这里。','金陵的雨，最懂打湿谁的稿纸。','一座城的文化，藏在散步者的脚步里。','书斋太小，装不下整个时代，于是他们走上街头。','街角的旧书店，是文人的客栈。','笔墨会褪色，街巷替他们收藏。','读万卷书，也要行万里巷。','文脉如水，流过街巷，也流进人心。']}];
+
+/* ================= 状态（每次打开均为未登录初始状态，仅存内存，方便比赛从零演示） ================= */
+let S=freshState();
+function freshState(){return{gender:'f',fit:'stu_f',bg:'in',quote:{b:'b2',i:3},photo:null,fx:50,fy:19,fr:11,works:[]}}
+function save(){}/* 仅存内存：刷新/退出登录即回到初始状态 */
+
+/* ================= 工具 & 双语 ================= */
+const $=s=>document.querySelector(s);
+function E(s){return s?' <span class="en">'+s+'</span>':''}
+function toggleEn(){document.body.classList.toggle('en-off');document.getElementById('enMark').textContent=document.body.classList.contains('en-off')?'':'✓'}
+let toastTimer;
+function toast(zh,en){const t=$('#toast');t.innerHTML=zh+(en?'<br><span class="en" style="color:rgba(255,255,255,.82);font-size:11px">'+en+'</span>':'');t.style.display='block';clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.style.display='none',2600)}
+function openMk(id){$('#'+id).classList.add('on')}
+function closeMk(id){$('#'+id).classList.remove('on')}
+function nav(pg,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));$('#'+pg).classList.add('on');document.querySelectorAll('nav button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');window.scrollTo(0,0)}
+function loadImage(url,retries){
+ // 优先带 crossOrigin=anonymous（海报/视频导出需读像素）；失败自动重试（AI 生成接口偶发超时）；仍失败退回普通加载保证显示
+ retries=retries===undefined?1:retries;
+ return new Promise(res=>{
+  const im=new Image();
+  im.crossOrigin='anonymous';
+  im.onload=()=>res(im);
+  im.onerror=()=>{
+   if(retries>0){setTimeout(()=>loadImage(url,retries-1).then(res),500)}
+   else{const im2=new Image();im2.onload=()=>res(im2);im2.onerror=()=>res(null);im2.src=url}
+  };
+  im.src=url})
+}
+
+/* ================= 启动 ================= */
+$('#splashMap').src=MAP_IMG;$('#mapImg').src=MAP_IMG;
+function enter(){$('#scr-splash').style.display='none';$('#scr-main').style.display='block';renderDots();renderBooks();renderFitUI();renderGal()}
+function logout(){S=freshState();$('#scr-main').style.display='none';$('#scr-splash').style.display='flex';window.scrollTo(0,0);toast('已退出登录，回到初始演示状态','Logged out · demo reset')}
+
+/* ================= 地图点位 ================= */
+function renderDots(){
+ $('#dots').innerHTML=POIS.map(p=>`<div class="dot" style="left:${p.x}%;top:${p.y}%" onclick="openPoi('${p.id}')"><b>${p.n}</b><span class="en" style="position:absolute;top:18px;left:50%;transform:translateX(-50%);font-size:9px;color:#91877a;white-space:nowrap">${p.en}</span><i></i></div>`).join('')}
+function openPoi(id){
+ const p=POIS.find(x=>x.id===id);const b=BOOKS.find(x=>x.id===p.book);
+ $('#poiName').innerHTML='🏛️ '+p.n+E(p.en);
+ $('#poiText').innerHTML=p.t+'<br><span class="en" style="font-size:12px">'+p.ten+'</span>';
+ const gq=encodeURIComponent('Yihe Road Nanjing');
+ const aq=encodeURIComponent('南京颐和路');
+ $('#poiSpots').innerHTML=`
+  <div class="spotH">📍 ${p.n} · 推荐拍照点位 <span class="en">TOP 3 Photo Spots</span></div>
+  <div class="spotnote">📷 请使用官方实景地图软件（谷歌实景 / 高德导航）对照导航，即可找到对应打卡地点。<br><span class="en">Use official street-view map apps (Google / Amap) to navigate to each photo spot.</span></div>
+  ${p.spots.map(s=>`<div class="spot"><b>🌳 ${s.n}</b>${E(s.en)}
+   <div class="d">${s.d}<br><span class="en" style="font-size:11px">${s.den}</span></div>
+   <div class="spotbtns">
+    <a class="spotbtn g" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Yihe Road Nanjing '+s.en)}">G 谷歌实景 · Google</a>
+    <a class="spotbtn a" target="_blank" rel="noopener" href="https://uri.amap.com/search?keyword=${encodeURIComponent(aq+' '+s.n)}&city=025">A 高德导航 · Amap</a>
+   </div></div>`).join('')}`;
+ $('#poiBook').innerHTML=`<div style="display:flex;gap:11px;align-items:center">
+  <img src="${COVERS[b.id]}" style="width:58px;height:58px;border-radius:10px;object-fit:cover" alt="">
+  <div style="flex:1"><b style="font-size:14px">${b.t}</b><div class="sub en" style="font-size:11px">${b.en}</div><div class="sub" style="margin:3px 0 7px">${b.a} · 配套 ${b.q.length} 句金句 ${E(b.aen+' · '+b.q.length+' quotes')}</div>
+  <button class="btn btn-p" style="padding:7px 16px;font-size:12.5px" onclick="openBook('${b.id}');closeMk('mk-poi')">翻开这本书 → ${E('Open')}</button></div></div>`;
+ openMk('mk-poi')}
+
+/* ================= 书单 ================= */
+function renderBooks(){
+ $('#bookList').innerHTML=BOOKS.map(b=>`<div class="card bk" onclick="openBook('${b.id}')">
+  <img src="${COVERS[b.id]}" alt="">
+  <div style="flex:1;min-width:0"><div class="t">${b.t}</div><div class="sub en" style="font-size:11px">${b.en}</div><div class="a">${b.a} · 颐和路限定 №${b.id[1]}/5 ${E('Yihe Rd. exclusive')}</div>
+  <div class="d">${b.d}</div></div></div>`).join('')}
+function openBook(id){
+ const b=BOOKS.find(x=>x.id===id);
+ const cur=S.quote.b===id?S.quote.i:-1;
+ $('#bookSheet').innerHTML=`
+  <button class="x" onclick="closeMk('mk-book')">✕</button>
+  <div style="display:flex;gap:12px;margin-bottom:12px">
+   <img src="${COVERS[b.id]}" style="width:86px;height:86px;border-radius:14px;object-fit:cover" alt="">
+   <div><h3 style="margin:0 0 5px">${b.t}<span class="en" style="display:block;font-size:12.5px;font-weight:400">${b.en}</span></h3><span class="pill">${b.a} ${E(b.aen)}</span><span class="pill">颐和路限定 ${E('Exclusive')}</span></div>
+  </div>
+  <div class="sub" style="line-height:1.8;font-size:13px">📖 ${b.d}<br><span class="en" style="font-size:12px">${b.en}</span></div>
+  <div class="demo-hint" style="margin-top:10px">📍 颐和路场景解读：${b.sc}<br><span class="en" style="color:#b3905c">Yihe Road reading tip: read this book at the matching stop on the map.</span></div>
+  <b style="font-size:14px;display:block;margin:12px 0 4px">✒️ 精选金句 ${b.q.length} 句 · 点「选这句打卡」去换装 <span class="en" style="font-weight:400;font-size:12px">10 quotes · tap to use for check-in</span></b>
+  <div class="quotes">${b.q.map((q,i)=>`<div class="q"><span>「${q}」</span>
+   <button class="${cur===i?'on':''}" onclick="chooseQuote('${b.id}',${i})">${cur===i?'✓ 已选 ':'选这句打卡'}${E(cur===i?'Picked':'Use')}</button></div>`).join('')}</div>`;
+ openMk('mk-book')}
+function chooseQuote(bid,i){
+ S.quote={b:bid,i};save();closeMk('mk-book');renderQuote();
+ toast('金句已选好，去「打卡换装」生成你的民国海报 📸','Quote ready · go to Dress-up');
+ nav('pg-fit',document.querySelectorAll('nav button')[2])}
+
+/* ================= 打卡换装 ================= */
+function renderFitUI(){
+ $('#fitRow').innerHTML=FITS.filter(f=>f.g===S.gender).map(f=>`<div class="sel ${S.fit===f.id?'on':''}" onclick="selFit('${f.id}')">
+  <img src="${f.img}" alt=""><div class="nm">${f.n} <span class="en" style="font-size:10px">${f.en}</span></div></div>`).join('');
+ $('#bgRow').innerHTML=Object.entries(BG_IMGS).map(([k,b])=>`<div class="sel bgsel ${S.bg===k?'on':''}" onclick="selBg('${k}')">
+  <img src="${b.img}" alt=""><div class="nm">${b.n} <span class="en" style="font-size:10px">${b.en}</span></div></div>`).join('');
+ renderQuote();setSliderRange();renderStage();ensureCache()}
+/* 把滑杆范围收窄到服装预设值的 ±15%，让用户只有微调自由度 */
+function setSliderRange(){
+ const f=FITS.find(x=>x.id===S.fit);
+ const rx=f.f.r;const ry=f.f.y;const rx2=f.f.x;
+ const slR=$('#slR');slR.min=(rx*0.85).toFixed(1);slR.max=(rx*1.15).toFixed(1);
+ const slY=$('#slY');slY.min=Math.max(5,(ry-10)).toFixed(1);slY.max=Math.min(50,(ry+10)).toFixed(1);
+ const slX=$('#slX');slX.min=Math.max(10,(rx2-20)).toFixed(1);slX.max=Math.min(90,(rx2+20)).toFixed(1);
+ slR.step=0.2;slY.step=0.5;slX.step=0.5;
+ // 如果当前值超出新范围，自动收进
+ if(S.fr<+slR.min||S.fr>+slR.max){S.fr=rx;save()}
+ if(S.fy<+slY.min||S.fy>+slY.max){S.fy=ry;save()}
+ if(S.fx<+slX.min||S.fx>+slX.max){S.fx=rx2;save()}
+ slR.value=S.fr;slY.value=S.fy;slX.value=S.fx}
+function setGender(g){
+ S.gender=g;
+ document.getElementById('gF').classList.toggle('on',g==='f');
+ document.getElementById('gM').classList.toggle('on',g==='m');
+ const cur=FITS.find(x=>x.id===S.fit);
+ if(!cur||cur.g!==g){const nf=FITS.find(x=>x.g===g);S.fit=nf.id;alignToFit(nf)}
+ save();renderFitUI()}
+/* 人脸自动贴合：把 fx/fy/fr 全部对齐到服装模型预设值 */
+function alignToFit(f){S.fx=f.f.x;S.fy=f.f.y;S.fr=f.f.r;save()}
+function useSample(g){
+ setGender(g);
+ const f=FITS.find(x=>x.id===S.fit);
+ S.photo=SAMPLE_FACES[g];alignToFit(f);save();setSliderRange();ensureCache();
+ toast('AI 已把'+(g==='f'?'女':'男')+'示例人脸手绘成卡通脸并贴合服装 👤','Sample face cartoonized & fitted ('+(g==='f'?'F':'M')+')')}
+function selFit(id){S.fit=id;const f=FITS.find(x=>x.id===id);alignToFit(f);save();renderFitUI();toast('已换上'+f.n,'Now wearing: '+f.en)}
+function selBg(k){S.bg=k;save();ensureCache();renderFitUI()}
+function renderQuote(){
+ const b=BOOKS.find(x=>x.id===S.quote.b);
+ $('#quoteShow').innerHTML='来自《'+b.t+'》'+E('From: '+b.en);
+ $('#stQt').textContent='「'+b.q[S.quote.i]+'」 —《'+b.t+'》'}
+function renderStage(){
+ $('#stBg').src=BG_IMGS[S.bg].img;
+ $('#stFace').style.display='none';/* 人脸已改由画布合成（在模型图层下） */
+ const cv=$('#stFit');
+ const W=cv.clientWidth||340,H=Math.round(W*4/3);
+ cv.width=W;cv.height=H;
+ /* 预览与海报共用同一套合成：打卡背景最底层 → 人脸 → 无脸服装模型（脸部开洞透出人脸） */
+ drawScene(cv.getContext('2d'),W,H,1,Date.now(),true);
+ $('#slX').value=S.fx;$('#slY').value=S.fy;$('#slR').value=S.fr}
+function setFace(){S.fx=+$('#slX').value;S.fy=+$('#slY').value;S.fr=+$('#slR').value;save();renderStage()}
+/* 相机 */
+let stream=null;
+async function openCam(){
+ try{
+  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1280}}});
+  const v=$('#cam');v.srcObject=stream;v.style.display='block';$('#shotCtl').style.display='flex';$('#camBtn').innerHTML='🔄 相机已开启 <span class="en sm">Camera on</span>';
+ }catch(e){toast('无法调用相机（file:// 或权限受限），请改用「上传正面照」','Camera blocked · use Upload instead')}
+}
+function closeCam(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
+ $('#cam').style.display='none';$('#shotCtl').style.display='none';$('#camBtn').innerHTML='📷 打开相机 <span class="en sm">Camera</span>'}
+function snap(){
+ const v=$('#cam');if(!v.videoWidth){toast('相机还没准备好','Camera not ready');return}
+ const cv2=document.createElement('canvas');cv2.width=v.videoWidth;cv2.height=v.videoHeight;
+ cv2.getContext('2d').drawImage(v,0,0);S.photo=cv2.toDataURL('image/jpeg',.85);
+ const f=FITS.find(x=>x.id===S.fit);alignToFit(f);save();setSliderRange();
+ closeCam();ensureCache();toast('人脸已捕获，已自动贴合服装脸型 ✨','Face captured & auto-aligned')}
+function pickFile(inp){
+ const f=inp.files[0];if(!f)return;
+ const r=new FileReader();r.onload=e=>{S.photo=e.target.result;
+  const ft=FITS.find(x=>x.id===S.fit);alignToFit(ft);save();setSliderRange();ensureCache();
+  toast('照片已就绪，已自动贴合服装脸型 ✨','Photo ready & auto-aligned')};r.readAsDataURL(f);inp.value=''}
+
+/* ================= 合成画布（海报 & 短视频共用） ================= */
+const _cache={bg:null,fit:null,fitT:null,photo:null,toon:null,faceBox:null,skin:null};
+/* 按尺寸复用的草稿画布（模型层开洞用） */
+const _scratch={};
+function scratchCv(w,h){const k=w+'x'+h;let c=_scratch[k];if(!c){c=document.createElement('canvas');c.width=w;c.height=h;_scratch[k]=c}return c}
+/* 服装图抠图（泛洪法）：
+   1) 从图像四边泛洪清除「与边缘连通」的背景白 → 打卡背景从服装图白底与肢体缝隙中透出；
+   2) 泛洪只沿连通路径扩散，四肢/浅色衣身等内部区域不会被误删（男女同规则，日常装四肢保持不透明）；
+   3) 脸部预留椭圆填充肤色 → 无脸模型的脸部底圈，供后续图层开洞让人脸透出、对照微调；
+   4) getImageData 被 CORS 拦截时返回 null → 回退手绘素雅衣身（保证打卡背景始终可见） */
+function makeTransparentFit(srcImg,f){
+ const cv=document.createElement('canvas');
+ cv.width=srcImg.width;cv.height=srcImg.height;
+ const ctx=cv.getContext('2d');
+ ctx.drawImage(srcImg,0,0);
+ let img;
+ try{img=ctx.getImageData(0,0,cv.width,cv.height)}
+ catch(e){console.warn('[makeTransparentFit] CORS 拦截，改用手绘衣身兜底:',e.message);return null}
+ const d=img.data,w=cv.width,h=cv.height;
+ // 背景种子色：四角+四边中点采样，量化后取众数 → 白底/黑底自适应
+ const P=(x,y)=>{const i=(y*w+x)*4;return [d[i],d[i+1],d[i+2]]};
+ const samples=[P(2,2),P(w-3,2),P(2,h-3),P(w-3,h-3),P(w>>1,2),P(w>>1,h-3),P(2,h>>1),P(w-3,h>>1)];
+ const qc=c=>Math.min(9,Math.floor(c/26));
+ const cnt={};let seed=[251,251,251],best=-1;
+ for(const s of samples){const k=qc(s[0])+','+qc(s[1])+','+qc(s[2]);cnt[k]=(cnt[k]||0)+1;
+  if(cnt[k]>best){best=cnt[k];seed=s}}
+ const seedL=0.299*seed[0]+0.587*seed[1]+0.114*seed[2];
+ let ok;
+ if(seedL>=160){
+  // 浅色底：亮度基线（最亮 1% 像素的最低亮度）+ 低饱和判据
+  const lums=[];
+  for(let i=0;i<d.length;i+=4){lums.push(0.299*d[i]+0.587*d[i+1]+0.114*d[i+2])}
+  lums.sort((a,b)=>b-a);
+  const THRESH=lums[Math.min(lums.length-1,Math.floor(lums.length*0.01))]-8;
+  ok=i=>{const r=d[i],g=d[i+1],b=d[i+2];
+   return 0.299*r+0.587*g+0.114*b>=THRESH-6&&Math.max(r,g,b)-Math.min(r,g,b)<=22};
+ }else{
+  // 深色底：与种子色的欧氏距离判据（避免误食人物深色衣身，容差收紧）
+  ok=i=>{const dr=d[i]-seed[0],dg=d[i+1]-seed[1],db=d[i+2]-seed[2];
+   return dr*dr+dg*dg+db*db<=484};
+ }
+ // 从四边泛洪：只清与边缘连通的背景白
+ const seen=new Uint8Array(w*h);
+ const erased=new Uint8Array(w*h);
+ const stack=[];
+ for(let x=0;x<w;x++){stack.push(x,x+(h-1)*w)}
+ for(let y=0;y<h;y++){stack.push(y*w,y*w+w-1)}
+ while(stack.length){
+  const p=stack.pop();
+  if(seen[p])continue;seen[p]=1;
+  const i=p*4;
+  if(!ok(i))continue;
+  d[i+3]=0;erased[p]=1;
+  const x=p%w,y=(p/w)|0;
+  if(x>0)stack.push(p-1);
+  if(x<w-1)stack.push(p+1);
+  if(y>0)stack.push(p-w);
+  if(y<h-1)stack.push(p+w);
+ }
+ // 封闭白袋清除：被轮廓围死、不与图像边缘连通的近白小区域（如手臂与躯干间的白底残留）
+ // → 一并擦除露出打卡背景；大面积浅色衣身连通域远超面积阈值，保持不透明（四肢/面料不透规则不受影响）
+ let erasedN=0;
+ for(let p=0;p<w*h;p++)if(erased[p])erasedN++;
+ const WHITE_MAX=Math.floor(w*h*0.04);
+ if(erasedN<w*h*0.95){
+  const lab=new Int32Array(w*h); // 0=未访问 -1=跳过 >=1 连通域号
+  const sizes=[0],edges=[false],mems=[null];
+  let cid=0;let st=[0];
+  for(let p0=0;p0<w*h;p0++){
+   if(lab[p0]!==0)continue;
+   const i0=p0*4;
+   if(d[i0+3]===0){lab[p0]=-1;continue}
+   if(!ok(i0)){lab[p0]=-1;continue}
+   cid++;let sz=0,edge=false;const mem=[];st=[p0];lab[p0]=cid;
+   while(st.length){
+    const p=st.pop();mem.push(p);sz++;
+    const x=p%w,y=(p/w)|0;
+    if(x===0||x===w-1||y===0||y===h-1)edge=true;
+    if(x>0&&lab[p-1]===0){lab[p-1]=cid;st.push(p-1)}
+    if(x<w-1&&lab[p+1]===0){lab[p+1]=cid;st.push(p+1)}
+    if(y>0&&lab[p-w]===0){lab[p-w]=cid;st.push(p-w)}
+    if(y<h-1&&lab[p+w]===0){lab[p+w]=cid;st.push(p+w)}
+   }
+   sizes.push(sz);edges.push(edge);mems.push(mem);
+  }
+  for(let k=1;k<=cid;k++){
+   if(!edges[k]&&sizes[k]<=WHITE_MAX){const mem=mems[k];
+    for(let q=0;q<mem.length;q++){d[mem[q]*4+3]=0;erased[mem[q]]=1}}
+  }
+ }
+ // 边缘羽化：与擦除区相邻的轮廓像素做半透明过渡
+ for(let p=0;p<w*h;p++){
+  if(erased[p])continue;
+  const i=p*4;if(d[i+3]===0)continue;
+  let n=0;const x=p%w,y=(p/w)|0;
+  if(x>0&&erased[p-1])n++;if(x<w-1&&erased[p+1])n++;
+  if(y>0&&erased[p-w])n++;if(y<h-1&&erased[p+w])n++;
+  if(n>=2)d[i+3]=150;
+ }
+ // 守卫：清除比例过低说明该图没有可识别的白底，整图会遮死打卡背景 → 回退手绘衣身
+ erasedN=0;for(let p=0;p<w*h;p++)if(erased[p])erasedN++;
+ if(erasedN<w*h*0.05){console.warn('[makeTransparentFit] 白底清除比例过低('+(erasedN/(w*h)*100).toFixed(1)+'%)，回退手绘衣身');return null}
+ ctx.putImageData(img,0,0);
+ // 脸部预留椭圆填肤色（与海报 3:4 封套映射一致，所有场景通用）
+ const RW=720,RH=960;
+ const rr=Math.max(RW/srcImg.width,RH/srcImg.height);
+ const icx=(RW*f.f.x/100-(RW-srcImg.width*rr)/2)/rr;
+ const icy=(RH*f.f.y/100-(RH-srcImg.height*rr)/2)/rr;
+ const irx=RW*f.f.r/100/rr;
+ ctx.fillStyle='#f2e4d4';
+ ctx.beginPath();ctx.ellipse(icx,icy,irx,irx*1.15,0,0,Math.PI*2);ctx.fill();
+ // 自动检测模型肤色区的精确形状 → 生成 modelFaceMask / modelFaceBox
+ const mfd=detectModelFacePatch(ctx,w,h,icx,icy,irx);
+ if(mfd){cv._modelFaceMask=mfd.mask;cv._modelFaceBox=mfd.box}
+ return cv}
+/* 从模型画布的肤色椭圆中心出发泛洪，找出实际肤色区的精确形状。
+   返回 {mask: canvas(alpha遮罩), box: {cx,cy,rx,ry}(精确脸框，相对模型原图尺寸)}。
+   遮罩带 15% 椭圆羽化带 + 泛洪边界验证，确保只取真正的肤色区像素。 */
+function detectModelFacePatch(ctx,w,h,seedX,seedY,seedR){
+ let img;try{img=ctx.getImageData(0,0,w,h)}catch(e){return null}
+ const d=img.data;
+ const SC=[242,228,212]; // #f2e4d4
+ const tol=36;
+ const lab=new Uint8Array(w*h);
+ const sx=Math.max(0,Math.min(w-1,Math.round(seedX)));
+ const sy=Math.max(0,Math.min(h-1,Math.round(seedY)));
+ const stack=[sy*w+sx];
+ let minX=w,maxX=0,minY=h,maxY=0,total=0;
+ while(stack.length){
+  const p=stack.pop();if(lab[p])continue;lab[p]=1;
+  const i=p*4;if(d[i+3]<10)continue;
+  const dr=d[i]-SC[0],dg=d[i+1]-SC[1],db=d[i+2]-SC[2];
+  if(dr*dr+dg*dg+db*db>tol*tol)continue;
+  total++;const x=p%w,y=(p/w)|0;
+  if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;
+  if(x>0)stack.push(p-1);if(x<w-1)stack.push(p+1);
+  if(y>0)stack.push(p-w);if(y<h-1)stack.push(p+w);}
+ if(total<500)return null;
+ // 边界内缩 3px，作为"确定区"
+ const eroded=new Uint8Array(w*h);
+ for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
+  const p=y*w+x;
+  if(!lab[p])continue;
+  if(lab[p-1]&&lab[p+1]&&lab[p-w]&&lab[p+w])eroded[p]=1;
+ }
+ let ex1=w,ex2=0,ey1=h,ey2=0;
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+  if(!eroded[y*w+x])continue;
+  if(x<ex1)ex1=x;if(x>ex2)ex2=x;if(y<ey1)ey1=y;if(y>ey2)ey2=y;}
+ const cx=(ex1+ex2)/2,cy=(ey1+ey2)/2;
+ const rx=Math.max(4,(ex2-ex1)/2),ry=Math.max(4,(ey2-ey1)/2);
+ // 生成 alpha mask：椭圆中心全不透明 + 边界 15% 羽化带 + 泛洪像素验证
+ const maskCv=document.createElement('canvas');maskCv.width=w;maskCv.height=h;
+ const mctx=maskCv.getContext('2d');
+ const mimg=mctx.createImageData(w,h);const md=mimg.data;
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+  const nx=(x-cx)/rx,ny=(y-cy)/ry;
+  const dist=Math.sqrt(nx*nx+ny*ny);
+  let a=0;
+  if(dist<=0.85)a=255;
+  else if(dist<=1.0)a=255*(1-(dist-0.85)/0.15);
+  const p=y*w+x;
+  if(!lab[p])a=0;
+  const i=p*4;md[i]=255;md[i+1]=255;md[i+2]=255;md[i+3]=Math.round(a);
+ }
+ mctx.putImageData(mimg,0,0);
+ return{mask:maskCv,box:{cx,cy,rx,ry}}
+}
+async function ensureCache(force){
+ try{
+  _cache.bg=await loadImage(BG_IMGS[S.bg].img,force?2:1);
+ }catch(e){console.warn('[ensureCache] 背景图加载失败:',e.message);_cache.bg=null}
+ try{
+  const f=FITS.find(x=>x.id===S.fit);
+  const fitImg=await loadImage(f.img,force?2:1);
+  _cache.fit=fitImg;
+  _cache.fitT=(fitImg&&isClean(fitImg))?makeTransparentFit(fitImg,f):null;
+ // 从 fitT 提取模型脸部精确遮罩/脸框
+ _cache.modelFaceMask=(_cache.fitT&&_cache.fitT._modelFaceMask)||null;
+ _cache.modelFaceBox=(_cache.fitT&&_cache.fitT._modelFaceBox)||null;
+ }catch(e){console.warn('[ensureCache] 服装图加载失败:',e.message);_cache.fit=null;_cache.fitT=null;_cache.modelFaceMask=null;_cache.modelFaceBox=null}
+ try{
+  _cache.photo=S.photo?await loadImage(S.photo,0):null;
+ }catch(e){console.warn('[ensureCache] 人像加载失败:',e.message);_cache.photo=null}
+ // 照片现代化：提饱和+增亮+去偏黄，消除复古/暗淡照片的肤色不协调
+ if(_cache.photo&&isClean(_cache.photo)){
+  const mc=document.createElement('canvas');mc.width=_cache.photo.width;mc.height=_cache.photo.height;
+  mc._origSrc=_cache.photo.src||''; // 保留原始src供SAMPLE_BOX预标定匹配
+  const mcc=mc.getContext('2d');
+  try{mcc.filter='saturate(1.4) contrast(1.08) brightness(1.06) hue-rotate(-8deg)'}catch(e){}
+  mcc.drawImage(_cache.photo,0,0);
+  try{mcc.filter='none'}catch(e){}
+  _cache.photo=mc;
+ }
+ // AI手绘卡通脸：AI 人脸识别（脸框）→ 程序化手绘化（平涂+描线）→ 实测肤色重绘模型脸部预留区
+ _cache.toon=null;_cache.faceBox=null;_cache.skin=null;
+ if(_cache.photo&&isClean(_cache.photo)){
+  _cache.faceBox=detectFace(_cache.photo);
+  _cache.toon=cartoonizeFace(_cache.photo,_cache.faceBox);
+  if(_cache.fitT){
+   const f=FITS.find(x=>x.id===S.fit);
+   const skin=avgSkinColor(_cache.toon||_cache.photo,_cache.faceBox);
+   if(skin){_cache.skin=skin;repaintFacePatch(f,skin)}
+  }
+ }
+ // 分层污染标记：导出兜底时只丢弃被跨域污染的图层，干净图层照常用
+ _cache.bgDirty=_cache.bg?!isClean(_cache.bg):true;
+ _cache.photoDirty=_cache.photo?!isClean(_cache.photo):true;
+ console.info('[cache] bg='+(!!_cache.bg)+' fitT='+!!_cache.fitT+' toon='+!!_cache.toon+' faceBox='+(_cache.faceBox?'ok':'fallback')+' modelFaceMask='+!!_cache.modelFaceMask);
+ // 强制刷新预览（直接同步重绘，避免后台标签页 RAF 被节流导致旧帧滞留）
+ renderStage()
+}
+/* 检测图片是否可安全读像素（未跨域污染）——供导出兜底分层判断 */
+function isClean(img){
+ try{const c=document.createElement('canvas');c.width=2;c.height=2;
+  c.getContext('2d').drawImage(img,0,0,2,2);
+  c.getContext('2d').getImageData(0,0,1,1);return true}
+ catch(e){return false}}
+/* ===== AI 手绘卡通脸 =====
+   1) detectFace：人脸定位三级策略——
+      ① 示例人像：预标定脸框（同一 CDN 资源恒定，确定性 100%）；
+      ② 用户照片：肤色区域连通域检测（RGB+YCbCr 双判据 + 背景差分排除），
+         二阶矩反推脸型椭圆，连到脖子/衣领时按脸宽比例上移脸心；
+      ③ 均失败：默认居中脸框（滑杆仍可微调）。
+   2) cartoonizeFace：程序化 AI 手绘化——平滑提饱和（平涂底）→ 色阶量化（手绘色块）
+      → Sobel 描线（淡墨勾边）→ 暖纸色调统一，输出与服装画风一致的卡通人脸；
+   3) avgSkinColor：在检测脸框内采样实测肤色（供模型脸部预留区重绘，衔接零色差）；
+   4) repaintFacePatch：把服装模型的脸部预留椭圆重绘为实测肤色；
+   5) drawFace：检测脸框→模型脸位仿射映射 + 椭圆径向羽化蒙版，卡通脸从模型图层下透出 */
+const FACE_FALLBACK={cx:.5,cy:.44,rx:.17,ry:.22}; // ③ 默认脸框（居中正面照构图）
+const SAMPLE_BOX={ // ① 示例人像预标定脸框（按 CDN 资源指纹匹配）
+ 'e3d706cff8358c0873357236ec97e8ed':{cx:.50,cy:.42,rx:.16,ry:.21}, // 女示例
+ '65661004cdea3ea519fa23dde4646cc6':{cx:.50,cy:.40,rx:.15,ry:.20}}; // 男示例
+function detectFace(im){
+ const src=im&&(im.src||im._origSrc)||'';
+ for(const k in SAMPLE_BOX){if(src.indexOf(k)>=0)return SAMPLE_BOX[k]}
+ // ② 肤色检测（仅处理可读像素图）
+ if(!isClean(im))return null;
+ const cv=document.createElement('canvas');
+ const s=Math.min(1,200/Math.max(im.width,im.height));
+ const w=Math.max(16,Math.round(im.width*s)),h=Math.max(16,Math.round(im.height*s));
+ cv.width=w;cv.height=h;
+ const c=cv.getContext('2d');
+ try{c.drawImage(im,0,0,w,h)}catch(e){return null}
+ let img;try{img=c.getImageData(0,0,w,h)}catch(e){return null}
+ const d=img.data;
+ // 背景差分：四边条带中位色，先排除与背景相近的像素（影棚素底/浅墙误判）
+ const P=(x,y)=>{const i=(y*w+x)*4;return[d[i],d[i+1],d[i+2]]};
+ const bs=[];
+ for(let x=1;x<w;x+=2){bs.push(P(x,1),P(x,h-2))}
+ for(let y=1;y<h;y+=2){bs.push(P(1,y),P(w-2,y))}
+ const rs=bs.map(p=>p[0]).sort((a,b)=>a-b),gs=bs.map(p=>p[1]).sort((a,b)=>a-b),bb=bs.map(p=>p[2]).sort((a,b)=>a-b);
+ const bgc=[rs[bs.length>>1],gs[bs.length>>1],bb[bs.length>>1]];
+ const bgd=i=>{const dr=d[i]-bgc[0],dg=d[i+1]-bgc[1],db=d[i+2]-bgc[2];return dr*dr+dg*dg+db*db};
+ const isSkin=i=>{
+  if(bgd(i)<1600)return false; // 与背景色距 <40 → 视为背景
+  const r=d[i],g=d[i+1],b=d[i+2];
+  const mx=Math.max(r,g,b),mn=Math.min(r,g,b);
+  if(r<60||g<32||b<16||r<=g||r<=b||mx-mn<14||r-g<8)return false; // RGB 基础判据
+  const cb=128-.169*r-.331*g+.5*b,cr=128+.5*r-.419*g-.081*b;     // YCbCr 肤色带
+  return cb>=74&&cb<=130&&cr>=132&&cr<=178};
+ const skin=new Uint8Array(w*h);
+ let total=0;
+ for(let p=0;p<w*h;p++){if(isSkin(p*4)){skin[p]=1;total++}}
+ if(total<w*h*0.015)return null; // 肤色占比过低，不像人像
+ // 连通域：取「面积×居中度」最优且落在上中部的肤色区作为人脸
+ const lab=new Int32Array(w*h);
+ let best=null;
+ for(let p0=0;p0<w*h;p0++){
+  if(!skin[p0]||lab[p0])continue;
+  let sz=0,sx=0,sy=0,sxx=0,syy=0,xmin=w,xmax=0,ymin=h,ymax=0;
+  const st=[p0];lab[p0]=1;
+  while(st.length){
+   const p=st.pop();sz++;
+   const x=p%w,y=(p/w)|0;
+   sx+=x;sy+=y;sxx+=x*x;syy+=y*y;
+   if(x<xmin)xmin=x;if(x>xmax)xmax=x;if(y<ymin)ymin=y;if(y>ymax)ymax=y;
+   if(x>0&&skin[p-1]&&!lab[p-1]){lab[p-1]=1;st.push(p-1)}
+   if(x<w-1&&skin[p+1]&&!lab[p+1]){lab[p+1]=1;st.push(p+1)}
+   if(y>0&&skin[p-w]&&!lab[p-w]){lab[p-w]=1;st.push(p-w)}
+   if(y<h-1&&skin[p+w]&&!lab[p+w]){lab[p+w]=1;st.push(p+w)}
+  }
+  const cx=sx/sz/w,cy=sy/sz/h;
+  if(cy>0.78||cx<0.12||cx>0.88)continue; // 人脸应在上中部
+  const bw=xmax-xmin,bh=ymax-ymin;
+  const vx=Math.max(0,sxx/sz-(sx/sz)*(sx/sz)),vy=Math.max(0,syy/sz-(sy/sz)*(sy/sz));
+  let rx=Math.sqrt(vx)*2/w,ry=Math.sqrt(vy)*2/h,cyy=cy; // 椭圆二阶矩：var=ry²/4
+  if(bh>bw*1.7){
+   // 脸和脖子/胸口连成一片：按脸宽推算——脸高≈1.44×脸宽，脸心从肤色区顶端下移 0.72×脸宽
+   rx=bw/2/w;cyy=(ymin+bw*.72)/h;ry=rx*1.28;
+  }
+  if(rx<0.07||rx>0.30||ry<0.07||ry>0.36)continue; // 尺寸不合理（手/衣领/背景色块）
+  const score=sz*(1-Math.abs(cx-0.5))*(1-Math.abs(cyy-0.42));
+  if(!best||score>best.score)best={score,cx,cy:cyy,rx,ry};
+ }
+ return best}
+/* AI 手绘化 v2：真人照 → 无真实感的手绘卡通脸（强平涂 + 粗墨描线 + 暖纸色调） */
+function cartoonizeFace(im,fb){
+ if(!isClean(im))return null;
+ const MAX=384;
+ const s=Math.min(1,MAX/Math.max(im.width,im.height));
+ const w=Math.max(32,Math.round(im.width*s)),h=Math.max(32,Math.round(im.height*s));
+ const base=document.createElement('canvas');base.width=w;base.height=h;
+ const bc=base.getContext('2d');
+ // ① 极强平滑 + 超饱和：彻底磨掉摄影纹理，得到大色块平涂底
+ try{bc.filter='blur(6px) saturate(2.2) contrast(0.92) brightness(1.08)'}catch(e){}
+ bc.drawImage(im,0,0,w,h);
+ try{bc.filter='none'}catch(e){}
+ let img;
+ try{img=bc.getImageData(0,0,w,h)}catch(e){return null}
+ const d=img.data;
+ // 灰度取自量化前的平涂影调——避免色阶阶梯产生假轮廓
+ const gray=new Float32Array(w*h);
+ for(let p=0;p<w*h;p++){gray[p]=.299*d[p*4]+.587*d[p*4+1]+.114*d[p*4+2]}
+ // ② 极强制色阶量化：Q=80 → 每通道约 3 级（总 27 色），大块平涂
+ const Q=80;
+ for(let i=0;i<d.length;i+=4){
+  d[i]=Math.round(d[i]/Q)*Q;d[i+1]=Math.round(d[i+1]/Q)*Q;d[i+2]=Math.round(d[i+2]/Q)*Q;
+  if(d[i]>250)d[i]=250;if(d[i+1]>250)d[i+1]=250;if(d[i+2]>250)d[i+2]=250;
+ }
+ // ③ Sobel 描线 + 膨胀：粗墨线（阈值 30 起笔，80 全墨，alpha 0.85）
+ const ink=new Float32Array(w*h); // 单独记录描线强度
+ for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
+  const p=y*w+x;
+  const gx=-gray[p-w-1]-2*gray[p-1]-gray[p+w-1]+gray[p-w+1]+2*gray[p+1]+gray[p+w+1];
+  const gy=-gray[p-w-1]-2*gray[p-w]-gray[p-w+1]+gray[p+w-1]+2*gray[p+w]+gray[p+w+1];
+  const g=Math.sqrt(gx*gx+gy*gy);
+  let a=(g-30)/50; // 阈值 30 起笔，80 全墨
+  if(a<=0)continue;if(a>1)a=1;
+  ink[p]=a*0.85; // 粗墨线
+ }
+ // 描线膨胀：把边缘向外扩 2px，线条更粗
+ const ink2=new Float32Array(w*h);
+ for(let y=2;y<h-2;y++)for(let x=2;x<w-2;x++){
+  const p=y*w+x;
+  let mx=ink[p];
+  if(ink[p-1]>mx)mx=ink[p-1];if(ink[p+1]>mx)mx=ink[p+1];
+  if(ink[p-w]>mx)mx=ink[p-w];if(ink[p+w]>mx)mx=ink[p+w];
+  if(ink[p-2]>mx)mx=ink[p-2];if(ink[p+2]>mx)mx=ink[p+2];
+  if(ink[p-2*w]>mx)mx=ink[p-2*w];if(ink[p+2*w]>mx)mx=ink[p+2*w];
+  ink2[p]=mx;
+ }
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+  const p=y*w+x;const a=ink2[p];
+  if(a<=0)continue;
+  const i=p*4;
+  d[i]=d[i]*(1-a)+45*a;d[i+1]=d[i+1]*(1-a)+35*a;d[i+2]=d[i+2]*(1-a)+28*a;
+ }
+ // ④ 暖纸色调统一 + 轻微去绿：向暖纸色偏移，去除所有摄影感
+ for(let i=0;i<d.length;i+=4){
+  d[i]=Math.min(255,d[i]*1.04+4);d[i+1]=Math.min(255,d[i+1]*.99+1);d[i+2]=Math.min(255,d[i+2]*.94+3);
+ }
+ bc.putImageData(img,0,0);
+ return base}
+function avgSkinColor(im,fb){
+ const f=fb||FACE_FALLBACK;
+ const cv=document.createElement('canvas');
+ const s=Math.min(1,140/Math.max(im.width,im.height));
+ cv.width=Math.max(8,Math.round(im.width*s));cv.height=Math.max(8,Math.round(im.height*s));
+ const c=cv.getContext('2d');
+ try{c.drawImage(im,0,0,cv.width,cv.height)}catch(e){return null}
+ let img;
+ try{img=c.getImageData(0,0,cv.width,cv.height)}catch(e){return null}
+ const d=img.data,w=cv.width,h=cv.height;
+ let r=0,g=0,b=0,n=0;
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+  const nx=(x-f.cx*w)/(f.rx*w*.8),ny=(y-f.cy*h)/(f.ry*h*.8); // 检测脸框内采样（再收 20% 避开发丝边缘）
+  if(nx*nx+ny*ny>1)continue;
+  const i=(y*w+x)*4;
+  const lum=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+  if(lum<45||lum>242)continue; // 排除头发阴影与高光
+  r+=d[i];g+=d[i+1];b+=d[i+2];n++;
+ }
+ if(n<40)return null;
+ return [Math.round(r/n),Math.round(g/n),Math.round(b/n)]}
+function repaintFacePatch(f,skin){
+ if(!_cache.fitT||!skin)return;
+ const t=_cache.fitT,c=t.getContext('2d');
+ const RW=720,RH=960;
+ const r=Math.max(RW/t.width,RH/t.height);
+ const icx=(RW*f.f.x/100-(RW-t.width*r)/2)/r;
+ const icy=(RH*f.f.y/100-(RH-t.height*r)/2)/r;
+ const irx=RW*f.f.r/100/r;
+ c.save();
+ c.fillStyle='rgb('+skin[0]+','+skin[1]+','+skin[2]+')';
+ c.beginPath();c.ellipse(icx,icy,irx*1.05,irx*1.15*1.05,0,0,Math.PI*2);c.fill(); // 放大5%完全覆盖旧色圈
+ c.restore()}
+/* 图层顺序：① 打卡背景（最底层）→ ② 服装模型（卡通脸直接融合进模型脸部位置，
+   椭圆羽化无缝衔接，无矩形边/无双重人像）→ 落叶 → 金句水印 */
+function drawScene(ctx,W,H,zoom,leafT,simple){
+ const bg=BG_IMGS[S.bg],f=FITS.find(x=>x.id===S.fit),b=BOOKS.find(x=>x.id===S.quote.b);
+ const enOn=!document.body.classList.contains('en-off');
+ ctx.save();
+ if(zoom&&zoom!==1){ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-W/2,-H/2)}
+ // 1) 打卡背景（最底层）：AI 图（跨域失败自动回退莫兰迪渐变）
+ const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,bg.c1);g.addColorStop(1,bg.c2);
+ ctx.fillStyle=g;ctx.fillRect(-W,-H,W*3,H*3);
+ if(_cache.bg){const im=_cache.bg;const r=Math.max(W/im.width,H/im.height);
+  ctx.drawImage(im,(W-im.width*r)/2,(H-im.height*r)/2,im.width*r,im.height*r)}
+ else{drawFallbackBg(ctx,W,H,S.bg)}
+ ctx.fillStyle='rgba(60,45,25,.18)';ctx.fillRect(-W,-H,W*3,H*3);
+ // 2) 卡通脸（有模型时融合进 drawModel；无模型时单独画椭圆羽化脸）
+ drawFace(ctx,W,H);
+ // 3) 服装模型（卡通脸直接融合进脸部位置；无 fitT 时回退手绘素雅衣身）
+ drawModel(ctx,W,H);
+ // 空脸引导圈（仅预览、未上传人脸时提示贴合位置）
+ if(simple&&!_cache.photo){
+  ctx.save();ctx.setLineDash([5,4]);ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=1.6;
+  ctx.beginPath();ctx.ellipse(W*S.fx/100,H*S.fy/100,W*S.fr/100,W*S.fr/100*1.15,0,0,Math.PI*2);ctx.stroke();ctx.restore()}
+ if(!simple){
+  // 4) 梧桐落叶动态氛围
+  drawLeaves(ctx,W,H,24,.55,leafT);
+ }
+ ctx.restore();
+ if(simple)return;
+ // 5) 金句与水印（固定不随推近缩放）
+ const grad=ctx.createLinearGradient(0,H*.6,0,H);grad.addColorStop(0,'rgba(40,30,18,0)');grad.addColorStop(1,'rgba(40,30,18,.78)');
+ ctx.fillStyle=grad;ctx.fillRect(0,H*.6,W,H*.4);
+ ctx.textAlign='center';ctx.fillStyle='#fff';
+ ctx.font=Math.round(W*.042)+'px "PingFang SC","Microsoft YaHei"';
+ const endY=wrap(ctx,'「'+b.q[S.quote.i]+'」',W/2,H*.79,W*.84,W*.062);
+ ctx.font=Math.round(W*.030)+'px "PingFang SC","Microsoft YaHei"';
+ ctx.fillText('—《'+b.t+'》',W/2,endY+W*.052);
+ if(enOn){ctx.font=Math.round(W*.019)+'px Georgia,"PingFang SC"';ctx.fillText('— '+b.en,W/2,endY+W*.088)}
+ ctx.textAlign='right';ctx.font=Math.round(W*.025)+'px "PingFang SC","Microsoft YaHei"';
+ ctx.fillText('锦创书城·颐和路店 × 颐和路书旅',W-12,H*.055);
+ if(enOn){ctx.font=Math.round(W*.017)+'px Georgia,serif';ctx.fillText('Jinchuang Books · Yihe Road Book Journey',W-12,H*.088)}}
+/* 卡通脸：画在底层，用 modelFaceMask(模型实际肤色区形状)精确裁切，
+   帽檐/发型/衣领保留在模型上层，自然遮挡人脸边缘 */
+function drawFace(ctx,W,H){
+ if(!_cache.toon)return;
+ const ph=_cache.toon;
+ const fb=_cache.faceBox||FACE_FALLBACK;
+ let mcx,mcy,mrx,mry;
+ if(_cache.fitT&&_cache.modelFaceBox){
+  const im=_cache.fitT;const rr=Math.max(W/im.width,H/im.height);
+  const dx=(W-im.width*rr)/2,dy=(H-im.height*rr)/2;
+  const mb=_cache.modelFaceBox;
+  mcx=mb.cx*rr+dx;mcy=mb.cy*rr+dy;mrx=mb.rx*rr;mry=mb.ry*rr;
+ }else{
+  mcx=W*S.fx/100;mcy=H*S.fy/100;mrx=W*S.fr/100;mry=mrx*1.15;}
+ const sx=mrx/(fb.rx*ph.width),sy=mry/(fb.ry*ph.height);
+ const sc=Math.max(sx,sy);
+ const dw=ph.width*sc,dh=ph.height*sc;
+ const bx=mcx-fb.cx*ph.width*sc,by=mcy-fb.cy*ph.height*sc;
+ const fc=document.createElement('canvas');fc.width=W;fc.height=H;
+ const fcx=fc.getContext('2d');
+ fcx.drawImage(ph,bx,by,dw,dh);
+ if(_cache.fitT&&_cache.modelFaceMask){
+  const im=_cache.fitT;const rr=Math.max(W/im.width,H/im.height);
+  const dx=(W-im.width*rr)/2,dy=(H-im.height*rr)/2;
+  fcx.globalCompositeOperation='destination-in';
+  fcx.drawImage(_cache.modelFaceMask,dx,dy,im.width*rr,im.height*rr);
+  fcx.globalCompositeOperation='source-over';
+ }else{
+  fcx.globalCompositeOperation='destination-out';
+  fcx.save();fcx.translate(mcx,mcy);fcx.scale(mrx,mry);
+  const gg=fcx.createRadialGradient(0,0,0,0,0,1);
+  gg.addColorStop(0,'rgba(0,0,0,0)');gg.addColorStop(.8,'rgba(0,0,0,0)');gg.addColorStop(1,'rgba(0,0,0,1)');
+  fcx.fillStyle=gg;fcx.beginPath();fcx.arc(0,0,1,0,Math.PI*2);fcx.fill();
+  fcx.restore();fcx.globalCompositeOperation='source-over';}
+ ctx.drawImage(fc,0,0)}
+/* 服装模型层：画在卡通脸之上，用 modelFaceMask 挖洞让底层卡通脸透出。
+   帽檐/发型/衣领在模型图片里保留在卡通脸之上自然遮挡 */
+function drawModel(ctx,W,H){
+ const f=FITS.find(x=>x.id===S.fit);
+ if(_cache.fitT){
+  const im=_cache.fitT;const rr=Math.max(W/im.width,H/im.height);
+  const dw=im.width*rr,dh=im.height*rr,dx=(W-dw)/2,dy=(H-dh)/2;
+  if(_cache.toon&&_cache.modelFaceMask){
+   const sc2=scratchCv(W,H),sctx=sc2.getContext('2d');
+   sctx.clearRect(0,0,W,H);
+   sctx.drawImage(im,dx,dy,dw,dh);
+   sctx.globalCompositeOperation='destination-out';
+   sctx.drawImage(_cache.modelFaceMask,dx,dy,dw,dh);
+   sctx.globalCompositeOperation='source-over';
+   ctx.drawImage(sc2,0,0);
+  }else if(_cache.toon){
+   const sc2=scratchCv(W,H),sctx=sc2.getContext('2d');
+   sctx.clearRect(0,0,W,H);
+   sctx.drawImage(im,dx,dy,dw,dh);
+   const cx=W*S.fx/100,cy=H*S.fy/100,rx=W*S.fr/100,ry=rx*1.15;
+   sctx.globalCompositeOperation='destination-out';
+   sctx.save();sctx.translate(cx,cy);sctx.scale(rx,ry);
+   const gg=sctx.createRadialGradient(0,0,0,0,0,1);
+   gg.addColorStop(0,'rgba(0,0,0,1)');gg.addColorStop(.88,'rgba(0,0,0,1)');gg.addColorStop(1,'rgba(0,0,0,0)');
+   sctx.fillStyle=gg;sctx.beginPath();sctx.arc(0,0,1,0,Math.PI*2);sctx.fill();
+   sctx.restore();sctx.globalCompositeOperation='source-over';
+   ctx.drawImage(sc2,0,0);
+  }else{
+   ctx.drawImage(im,dx,dy,dw,dh)}
+ }else{
+  drawFallbackOutfit(ctx,W,H,f)}}
+function drawLeaves(ctx,W,H,n,alpha,t){
+ for(let i=0;i<n;i++){
+  const s=Math.sin(i*127.1)*43758.5453;const fx=s-Math.floor(s);
+  const x=((fx*W)+Math.sin(t/1000*.8+i)*30+W)%W;
+  const y=((fx*H)+(t/1000*(28+fx*46))+H*2)%H;
+  ctx.save();ctx.globalAlpha=alpha*(.4+fx*.6);ctx.translate(x,y);ctx.rotate(t/900+i);
+  ctx.font=(12+fx*14)+'px serif';ctx.fillText(i%2?'🍃':'🍂',0,0);ctx.restore()}
+ ctx.globalAlpha=1}
+function wrap(ctx,text,cx,y,maxW,lh){
+ let line='',yy=y;for(const ch of text){if(ctx.measureText(line+ch).width>maxW){ctx.fillText(line,cx,yy);line=ch;yy+=lh}else line+=ch}
+ ctx.fillText(line,cx,yy);return yy}
+function roundRect(ctx,x,y,w,h,r){r=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+/* 兜底手绘民国装束：肩身+交领+盘扣+袖线+鞋，替代原先的抽象色块 */
+function drawFallbackOutfit(ctx,W,H,f){
+ const cx=W/2,faceY=H*f.f.y/100,faceR=W*f.f.r/100;
+ const ty=faceY+faceR*2.05;const bw=W*.56;const hemY=H*.94;
+ ctx.save();
+ ctx.beginPath();
+ ctx.moveTo(cx-bw/2,ty+H*.02);
+ ctx.quadraticCurveTo(cx-bw*.62,H*.45,cx-bw*.55,hemY);
+ ctx.lineTo(cx+bw*.55,hemY);
+ ctx.quadraticCurveTo(cx+bw*.62,H*.45,cx+bw/2,ty+H*.02);
+ ctx.quadraticCurveTo(cx,ty-H*.015,cx-bw/2,ty+H*.02);
+ ctx.closePath();
+ ctx.fillStyle=f.c;ctx.fill();
+ ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=Math.max(2,W*.008);ctx.lineCap='round';
+ ctx.beginPath();ctx.moveTo(cx,ty+H*.005);ctx.lineTo(cx-W*.055,ty+H*.06);ctx.moveTo(cx,ty+H*.005);ctx.lineTo(cx+W*.055,ty+H*.06);ctx.stroke();
+ ctx.beginPath();ctx.moveTo(cx,ty+H*.012);ctx.lineTo(cx,hemY-H*.05);ctx.stroke();
+ for(let i=0;i<4;i++){const by=ty+H*(.075+i*.055);ctx.beginPath();ctx.arc(cx+W*.028,by,Math.max(2,W*.008),0,Math.PI*2);ctx.stroke()}
+ ctx.beginPath();ctx.moveTo(cx-bw*.52,ty+H*.05);ctx.lineTo(cx-bw*.60,ty+H*.28);ctx.moveTo(cx+bw*.52,ty+H*.05);ctx.lineTo(cx+bw*.60,ty+H*.28);ctx.stroke();
+ ctx.fillStyle='rgba(50,40,30,.85)';
+ roundRect(ctx,cx-W*.095,hemY+H*.004,W*.085,H*.022,W*.02);ctx.fill();
+ roundRect(ctx,cx+W*.01,hemY+H*.004,W*.085,H*.022,W*.02);ctx.fill();
+ ctx.restore()}
+/* 手绘背景兜底：AI 背景图不可用（加载失败/跨域污染被丢弃）时，用简笔插画保证海报有"梧桐街景/店内书香"的插画感背景 */
+function drawFallbackBg(ctx,W,H,kind){
+ ctx.save();
+ const ink='rgba(93,78,58,.55)';
+ if(kind==='in'){
+  // 店内书香：两侧书架格 + 层板书本 + 暖黄吊灯
+  ctx.fillStyle=ink;
+  const sw=W*.16;
+  for(const side of[0,1]){const sx=side?W-sw:0;
+   ctx.fillRect(sx,H*.08,W*.012,H*.78);ctx.fillRect(sx+sw-W*.012,H*.08,W*.012,H*.78);
+   for(let i=0;i<4;i++){const sy=H*(.14+i*.18);
+    ctx.fillStyle=ink;ctx.fillRect(sx+H*.012,sy,sw-H*.024,H*.012);
+    for(let b=0;b<5;b++){const bw=(sw-H*.05)/5;
+     ctx.fillStyle=['rgba(140,90,70,.5)','rgba(90,110,95,.5)','rgba(120,100,70,.5)','rgba(100,90,110,.5)','rgba(150,120,80,.5)'][b];
+     ctx.fillRect(sx+H*.024+b*bw,sy-H*.055,bw*.72,H*.055)}}
+   ctx.fillStyle=ink}
+  ctx.fillStyle='rgba(220,180,90,.35)';
+  ctx.beginPath();ctx.arc(W/2,H*.1,W*.06,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle=ink;ctx.lineWidth=W*.006;
+  ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H*.045);ctx.stroke();
+ }else{
+  // 梧桐街景：两侧民国建筑剪影 + 拱窗 + 梧桐行道树
+  ctx.fillStyle=ink;
+  for(const side of[0,1]){const bx=side?W*.66:W*.06,bw=W*.28,bh=H*.34,by=H*.62-bh;
+   ctx.fillRect(bx,by,bw,bh);
+   ctx.beginPath();ctx.moveTo(bx-W*.015,by);ctx.lineTo(bx+bw/2,by-H*.075);ctx.lineTo(bx+bw+W*.015,by);ctx.closePath();ctx.fill();
+   ctx.fillStyle='rgba(245,241,234,.55)';
+   for(let r=0;r<2;r++)for(let c=0;c<3;c++){
+    const wx=bx+bw*.14+c*bw*.3,wy=by+bh*.18+r*bh*.36;
+    ctx.beginPath();ctx.arc(wx+W*.028,wy+W*.028,W*.026,Math.PI,0);ctx.lineTo(wx+W*.054,wy+W*.075);ctx.lineTo(wx,wy+W*.075);ctx.closePath();ctx.fill()}
+   ctx.fillStyle=ink}
+  // 地面
+  ctx.fillRect(0,H*.8,W,H*.02);
+  // 梧桐：树干+三圆树冠
+  for(const tx of[W*.38,W*.62]){
+   ctx.fillStyle='rgba(110,88,62,.6)';ctx.fillRect(tx-W*.012,H*.5,W*.024,H*.3);
+   ctx.fillStyle='rgba(120,145,100,.5)';
+   ctx.beginPath();ctx.arc(tx,H*.47,W*.13,0,Math.PI*2);ctx.fill();
+   ctx.beginPath();ctx.arc(tx-W*.1,H*.53,W*.09,0,Math.PI*2);ctx.fill();
+   ctx.beginPath();ctx.arc(tx+W*.1,H*.53,W*.09,0,Math.PI*2);ctx.fill()}
+ }
+ ctx.restore()}
+
+/* ================= 海报 ================= */
+/* 导出保护：画布若被跨域图污染（toDataURL 抛 SecurityError），只丢弃被污染的图层重画后再导出，保证海报/图鉴一定能生成 */
+function safeExport(cv,W,H,q){
+ try{return cv.toDataURL('image/jpeg',q)}
+ catch(e){
+  const keep={bg:_cache.bg,fit:_cache.fit,fitT:_cache.fitT,photo:_cache.photo};
+  if(_cache.bgDirty)_cache.bg=null;
+  if(_cache.photoDirty)_cache.photo=null;
+  try{drawScene(cv.getContext('2d'),W,H,1,Date.now())}catch(e2){}
+  _cache.bg=keep.bg;_cache.fit=keep.fit;_cache.fitT=keep.fitT;_cache.photo=keep.photo;
+  try{return cv.toDataURL('image/jpeg',q)}catch(e3){return null}
+ }
+}
+async function makePoster(){
+ if(!S.photo){toast('请先拍照或上传一张正面照 👤','Please take or upload a photo first');return}
+ toast('正在合成民国打卡海报…','Generating your ROC poster…');
+ await ensureCache(true);
+ const cv=document.createElement('canvas');cv.width=720;cv.height=960;
+ drawScene(cv.getContext('2d'),720,960,1,Date.now());
+ const a=safeExport(cv,720,960,.9);
+ if(!a){toast('图片服务跨域受限，海报导出失败，请稍后重试','Export blocked by image service · retry later');return}
+ const l=document.createElement('a');l.download='颐和路书旅_打卡海报.jpg';l.href=a;l.click();
+ const b=BOOKS.find(x=>x.id===S.quote.b),bg=BG_IMGS[S.bg],f=FITS.find(x=>x.id===S.fit);
+ S.works.unshift({id:'w'+Date.now(),type:'poster',img:a,q:b.q[S.quote.i],bk:b.t,bke:b.en,bg:bg.n,bge:bg.en,fit:f.n,fite:f.en,ts:stamp(),tse:stampEn()});
+ if(S.works.length>12)S.works.pop();
+ save();renderGal();
+ toast('海报已保存，并已存入「读书图鉴」🖼️','Poster saved & added to Gallery')}
+
+/* ================= 短视频（演示5秒；正式15秒改 VIDEO_MS 即可） ================= */
+const VIDEO_MS=5000;
+function cvSupported(){return !!(document.createElement('canvas').captureStream&&window.MediaRecorder)}
+function pickMime(){for(const m of['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm','video/mp4'])if(MediaRecorder.isTypeSupported(m))return m;return ''}
+async function makeVideo(){
+ if(!S.photo){toast('请先拍照或上传一张正面照 👤','Please take or upload a photo first');return}
+ if(!cvSupported()){toast('当前浏览器不支持短视频合成，请改用「生成打卡海报」','Video not supported here · use Poster instead');return}
+ toast('正在录制打卡短视频（演示5秒）…','Recording your check-in video (5s demo)…');
+ await ensureCache(true);
+ const cv=document.createElement('canvas');cv.width=540;cv.height=720;
+ const ctx=cv.getContext('2d');
+ drawScene(ctx,540,720,1,Date.now());
+ // 画布若被跨域图污染（captureStream/读像素抛错），只丢弃被污染的图层后重画并录制，保证短视频一定能生成
+ let keep=null;
+ try{ctx.getImageData(0,0,1,1)}
+ catch(e){keep={bg:_cache.bg,fit:_cache.fit,fitT:_cache.fitT,photo:_cache.photo};
+  if(_cache.bgDirty)_cache.bg=null;
+  if(_cache.photoDirty)_cache.photo=null;
+  drawScene(ctx,540,720,1,Date.now())}
+ let stream2;
+ try{stream2=cv.captureStream(24)}
+ catch(e){
+  if(keep){_cache.bg=keep.bg;_cache.fit=keep.fit;_cache.fitT=keep.fitT;_cache.photo=keep.photo}
+  toast('当前浏览器不允许录制跨域画布，请改用「生成打卡海报」','Canvas recording blocked · use Poster instead');return}
+ const rec=new MediaRecorder(stream2,pickMime()?{mimeType:pickMime()}:undefined);
+ const chunks=[];rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+ rec.onstop=()=>{const blob=new Blob(chunks,{type:rec.mimeType||'video/webm'});
+  if(keep){_cache.bg=keep.bg;_cache.fit=keep.fit;_cache.fitT=keep.fitT;_cache.photo=keep.photo}
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.download='颐和路书旅_打卡短视频.webm';a.href=url;a.click();
+  const b=BOOKS.find(x=>x.id===S.quote.b),bg=BG_IMGS[S.bg],f=FITS.find(x=>x.id===S.fit);
+  S.works.unshift({id:'w'+Date.now(),type:'video',vurl:url,q:b.q[S.quote.i],bk:b.t,bke:b.en,bg:bg.n,bge:bg.en,fit:f.n,fite:f.en,ts:stamp(),tse:stampEn()});
+  if(S.works.length>12)S.works.pop();
+  save();renderGal();
+  toast('短视频已生成保存，并已存入「读书图鉴」🎬','Video saved & added to Gallery')};
+ rec.start();
+ const t0=Date.now();
+ const timer=setInterval(()=>{const p=(Date.now()-t0)/VIDEO_MS;
+  if(p>=1){clearInterval(timer);rec.stop();return}
+  drawScene(ctx,540,720,1+p*.06,Date.now())},1000/24)}
+
+/* ================= 图鉴 & 分享 ================= */
+function saveWork(){
+ if(!S.photo){toast('请先拍照或上传正面照 👤','Please take or upload a photo first');return}
+ const b=BOOKS.find(x=>x.id===S.quote.b);
+ ensureCache(true).then(()=>{
+  const cv=document.createElement('canvas');cv.width=270;cv.height=360;
+  drawScene(cv.getContext('2d'),270,360,1,Date.now());
+  const img=safeExport(cv,270,360,.72);
+  if(!img){toast('图片服务跨域受限，存图鉴失败，请稍后再试','Export blocked by image service · retry later');return}
+  S.works.unshift({id:'w'+Date.now(),type:'poster',img:img,q:b.q[S.quote.i],bk:b.t,bke:b.en,bg:BG_IMGS[S.bg].n,bge:BG_IMGS[S.bg].en,fit:FITS.find(x=>x.id===S.fit).n,fite:FITS.find(x=>x.id===S.fit).en,ts:stamp(),tse:stampEn()});
+  if(S.works.length>12)S.works.pop();
+  save();renderGal();toast('已存入「颐和路读书图鉴」📚','Saved to your Reading Gallery 📚')})}
+function shareWork(){
+ const b=BOOKS.find(x=>x.id===S.quote.b);
+ const zh=`我在锦创书城·颐和路店打卡了《${b.t}》：「${b.q[S.quote.i]}」—— 颐和路书旅，一景一书，读遍颐和 🍂`;
+ const en=`I checked in at Jinchuang Bookstore (Yihe Rd.) with "${b.en}" — Yihe Road Book Journey: One Spot, One Book 🍂`;
+ const text=zh+'\n'+en;
+ if(navigator.share)navigator.share({title:'颐和路书旅 Yihe Road Book Journey',text}).catch(()=>{});
+ else if(navigator.clipboard)navigator.clipboard.writeText(text).then(()=>toast('文案已复制，去粘贴分享吧 🍂','Caption copied · paste and share'));
+ else toast(zh,en)}
+function stamp(){const d=new Date();return `${d.getMonth()+1}月${d.getDate()}日`}
+function stampEn(){const d=new Date();return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]+' '+d.getDate()}
+function renderGal(){
+ $('#galList').innerHTML=S.works.length?S.works.map(w=>{
+  const media=w.type==='video'
+   ?`<video src="${w.vurl}" controls playsinline></video><div class="tagv">🎬 短视频 ${E('Video')}</div>`
+   :`<img src="${w.img}" alt="">${w.type==='poster'?`<div class="tagv">🖼️ 海报 ${E('Poster')}</div>`:''}`;
+  return `<div class="g">${media}
+  <div class="cap">${w.q}<br><span style="opacity:.85">《${w.bk}》· ${w.bg} · ${w.fit} · ${w.ts}</span>${w.bke?`<span class="en" style="display:block;opacity:.7">${w.bke} · ${w.bge} · ${w.fite} · ${w.tse}</span>`:''}</div></div>`}).join('')
+ :'<div class="empty" style="grid-column:1/-1">还没有作品 🍂<br>去「打卡换装」生成你的第一张民国海报<span class="en" style="display:block;margin-top:6px">No works yet · go to Dress-up to create your first ROC poster</span></div>'}
+</script>
+</body>
+</html>
